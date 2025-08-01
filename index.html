@@ -96,9 +96,9 @@
             width: 200px;
         }
         
-        /* Custom dropdown arrow pointing up */
+        /* Custom dropdown arrow */
         .select-wrapper::after {
-            content: "▲";
+            content: "▼";
             font-size: 12px;
             color: white;
             position: absolute;
@@ -108,11 +108,17 @@
             pointer-events: none;
         }
         
-        /* Drop-up options styling */
+        /* Dropdown options styling */
         #station-select option {
             background-color: #000;
             color: white;
             padding: 10px;
+        }
+        
+        /* Force dropdown to show above other elements in full screen */
+        #station-select:focus {
+            position: relative;
+            z-index: 1000;
         }
         
         #play-btn {
@@ -257,10 +263,28 @@
                 const lastStation = localStorage.getItem('lastRadioStation');
                 if (lastStation) {
                     stationSelect.value = lastStation;
+                    // Auto-play the last station
+                    playStation(lastStation);
                 }
             } catch (error) {
                 console.error('Error loading stations:', error);
             }
+        }
+        
+        function playStation(url) {
+            if (!url) return;
+            
+            radioPlayer.src = url;
+            radioPlayer.play()
+                .then(() => {
+                    isPlaying = true;
+                    playBtn.textContent = '❚❚';
+                    localStorage.setItem('lastRadioStation', url);
+                })
+                .catch(error => {
+                    console.error('Playback failed:', error);
+                    alert('Error playing station. Please try another.');
+                });
         }
         
         function togglePlayback() {
@@ -269,19 +293,10 @@
             if (isPlaying) {
                 radioPlayer.pause();
                 playBtn.textContent = '▶';
+                isPlaying = false;
             } else {
-                radioPlayer.src = stationSelect.value;
-                radioPlayer.play()
-                    .then(() => {
-                        playBtn.textContent = '❚❚';
-                        localStorage.setItem('lastRadioStation', stationSelect.value);
-                    })
-                    .catch(error => {
-                        console.error('Playback failed:', error);
-                        alert('Error playing station. Please try another.');
-                    });
+                playStation(stationSelect.value);
             }
-            isPlaying = !isPlaying;
         }
         
         // Event listeners
@@ -306,8 +321,9 @@
         
         stationSelect.addEventListener('change', function() {
             if (isPlaying) {
-                togglePlayback();
-                togglePlayback();
+                // If already playing, stop current and start new station
+                radioPlayer.pause();
+                playStation(this.value);
             }
         });
         
@@ -320,100 +336,29 @@
         window.addEventListener('load', function() {
             const startupSound = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
             startupSound.volume = 0.3;
-            //startupSound.play();
+           // startupSound.play();
         });
 
-        // Force drop-up in fullscreen by inverting the select box
-        function setupDropUp() {
-            const selectWrapper = document.querySelector('.select-wrapper');
-            const select = document.getElementById('station-select');
-            
-            // Create a dummy select that will show the selected value
-            const dummySelect = document.createElement('div');
-            dummySelect.className = 'dummy-select';
-            dummySelect.textContent = select.options[select.selectedIndex].text;
-            selectWrapper.appendChild(dummySelect);
-            
-            // Create custom dropdown list
-            const dropdown = document.createElement('div');
-            dropdown.className = 'custom-dropdown';
-            dropdown.style.display = 'none';
-            
-            // Populate with options
-            Array.from(select.options).forEach(option => {
-                const item = document.createElement('div');
-                item.className = 'dropdown-item';
-                item.textContent = option.text;
-                item.addEventListener('click', () => {
-                    select.value = option.value;
-                    dummySelect.textContent = option.text;
-                    dropdown.style.display = 'none';
-                    if (isPlaying) {
-                        togglePlayback();
-                        togglePlayback();
-                    }
-                });
-                dropdown.appendChild(item);
-            });
-            
-            selectWrapper.appendChild(dropdown);
-            
-            // Toggle dropdown
-            dummySelect.addEventListener('click', (e) => {
-                e.stopPropagation();
-                dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-            });
-            
-            // Hide dropdown when clicking elsewhere
-            document.addEventListener('click', () => {
-                dropdown.style.display = 'none';
-            });
-            
-            // Hide original select but keep it functional
-            select.style.position = 'absolute';
-            select.style.opacity = '0';
-            select.style.height = '0';
-            select.style.width = '0';
-        }
+        // Force drop-up behavior in full screen
+        document.addEventListener('fullscreenchange', adjustDropdown);
+        document.addEventListener('webkitfullscreenchange', adjustDropdown);
+        document.addEventListener('mozfullscreenchange', adjustDropdown);
+        document.addEventListener('MSFullscreenChange', adjustDropdown);
 
-        // Initialize custom drop-up
-        window.addEventListener('load', setupDropUp);
+        function adjustDropdown() {
+            if (document.fullscreenElement || 
+                document.webkitFullscreenElement || 
+                document.mozFullScreenElement ||
+                document.msFullscreenElement) {
+                // In full screen, ensure dropdown appears above
+                stationSelect.style.position = 'fixed';
+                stationSelect.style.bottom = '60px';
+            } else {
+                // Exit full screen, revert to normal
+                stationSelect.style.position = '';
+                stationSelect.style.bottom = '';
+            }
+        }
     </script>
-
-    <style>
-        /* Custom drop-up styles */
-        .dummy-select {
-            padding: 8px 25px 8px 10px;
-            font-size: 16px;
-            border-radius: 20px;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            width: 200px;
-            cursor: pointer;
-            position: relative;
-        }
-        
-        .custom-dropdown {
-            position: absolute;
-            bottom: 100%;
-            left: 0;
-            background: #000;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 10px 10px 0 0;
-            max-height: 200px;
-            overflow-y: auto;
-            width: 100%;
-            z-index: 1000;
-        }
-        
-        .dropdown-item {
-            padding: 10px;
-            cursor: pointer;
-        }
-        
-        .dropdown-item:hover {
-            background: rgba(255,255,255,0.1);
-        }
-    </style>
 </body>
 </html>
