@@ -156,6 +156,15 @@
         .city-input:focus {
             opacity: 1;
         }
+
+        .countdown {
+            position: fixed;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2vh;
+            color: rgba(255,255,255,0.7);
+        }
     </style>
 </head>
 <body>
@@ -181,6 +190,8 @@
         </div>
         <button id="play-btn">▶</button>
     </div>
+
+    <div class="countdown" id="countdown"></div>
     
     <input type="text" class="city-input" id="city-input" placeholder="Enter city name">
 
@@ -197,11 +208,13 @@
         const stationSelect = document.getElementById('station-select');
         const playBtn = document.getElementById('play-btn');
         const radioPlayer = document.getElementById('radio-player');
+        const countdownEl = document.getElementById('countdown');
         
         // State
         let isPlaying = false;
         let stations = [];
         let currentStation = null;
+        let countdownTimer = null;
         
         // Clock function
         function updateClock() {
@@ -263,14 +276,28 @@
                 const lastStation = localStorage.getItem('lastRadioStation');
                 if (lastStation) {
                     stationSelect.value = lastStation;
-                    // Schedule auto-play after 1 second
-                    setTimeout(() => {
-                        playStation(lastStation);
-                    }, 1000);
+                    // Start 15-second countdown to autoplay
+                    startCountdown(lastStation);
                 }
             } catch (error) {
                 console.error('Error loading stations:', error);
             }
+        }
+
+        function startCountdown(stationUrl) {
+            let secondsLeft = 15;
+            countdownEl.textContent = `Auto-playing in ${secondsLeft} seconds...`;
+            
+            countdownTimer = setInterval(() => {
+                secondsLeft--;
+                countdownEl.textContent = `Auto-playing in ${secondsLeft} seconds...`;
+                
+                if (secondsLeft <= 0) {
+                    clearInterval(countdownTimer);
+                    countdownEl.textContent = '';
+                    playStation(stationUrl);
+                }
+            }, 1000);
         }
         
         function playStation(url) {
@@ -285,7 +312,7 @@
                 })
                 .catch(error => {
                     console.error('Playback failed:', error);
-                    // Don't show alert for autoplay as it might be blocked by browser
+                    countdownEl.textContent = 'Click anywhere to start playback';
                 });
         }
         
@@ -305,6 +332,16 @@
         document.body.addEventListener('click', function(e) {
             if (e.target !== cityInput && e.target !== stationSelect && e.target !== playBtn) {
                 cityInput.focus();
+                
+                // If countdown is running and user clicks, cancel it and play immediately
+                if (countdownTimer) {
+                    clearInterval(countdownTimer);
+                    countdownEl.textContent = '';
+                    const lastStation = localStorage.getItem('lastRadioStation');
+                    if (lastStation) {
+                        playStation(lastStation);
+                    }
+                }
             }
         });
         
@@ -333,14 +370,6 @@
         updateClock();
         loadStations();
         getWeather();
-        
-        // Handle autoplay restrictions
-        document.addEventListener('click', function() {
-            // This helps with browsers that block autoplay until user interaction
-            if (!isPlaying && localStorage.getItem('lastRadioStation')) {
-                radioPlayer.play().catch(e => console.log('Autoplay blocked:', e));
-            }
-        }, { once: true });
 
         // Force drop-up behavior in full screen
         document.addEventListener('fullscreenchange', adjustDropdown);
