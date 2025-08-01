@@ -84,6 +84,39 @@
             color: white;
             border: none;
             width: 60%;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        
+        /* Custom dropdown arrow */
+        .select-wrapper {
+            position: relative;
+            width: 60%;
+        }
+        
+        .select-wrapper::after {
+            content: "▼";
+            font-size: 12px;
+            color: white;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+        
+        /* Dropdown options styling */
+        #station-select option {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+        }
+        
+        /* Force dropdown to show above other elements */
+        #station-select:focus {
+            position: relative;
+            z-index: 1000;
         }
         
         #play-btn {
@@ -143,7 +176,9 @@
     
     <div class="controls-container">
         <div class="radio-controls">
-            <select id="station-select"></select>
+            <div class="select-wrapper">
+                <select id="station-select"></select>
+            </div>
             <button id="play-btn">▶</button>
         </div>
         
@@ -282,26 +317,26 @@
         });
         
         playBtn.addEventListener('click', function(e) {
-            e.stopPropagation(); // Prevent triggering body click
+            e.stopPropagation();
             togglePlayback();
         });
         
         stationSelect.addEventListener('change', function(e) {
-            e.stopPropagation(); // Prevent triggering body click
+            e.stopPropagation();
             if (isPlaying) {
-                togglePlayback(); // Stop current playback
-                togglePlayback(); // Start new station
+                togglePlayback();
+                togglePlayback();
             }
         });
         
         stationSelect.addEventListener('click', function(e) {
-            e.stopPropagation(); // Prevent triggering body click
+            e.stopPropagation();
         });
         
         // Initialize
         updateClock();
         loadStations();
-        getWeather(); // Load saved city if available
+        getWeather();
         
         // Play startup sound
         window.addEventListener('load', function() {
