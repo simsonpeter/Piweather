@@ -96,9 +96,9 @@
             width: 200px;
         }
         
-        /* Custom dropdown arrow pointing up */
+        /* Custom dropdown arrow */
         .select-wrapper::after {
-            content: "▲";
+            content: "▼";
             font-size: 12px;
             color: white;
             position: absolute;
@@ -108,30 +108,28 @@
             pointer-events: none;
         }
         
-        /* Drop-up options styling */
+        /* Dropdown options styling */
         #station-select option {
             background-color: #000;
             color: white;
             padding: 10px;
-            direction: rtl; /* Makes text appear from right to left */
         }
         
-        /* Force dropdown to open upwards */
-        #station-select {
+        /* Force dropdown to show above other elements in full screen */
+        #station-select:focus {
             position: relative;
-            top: auto;
-            bottom: 100%;
+            z-index: 1000;
         }
         
         #play-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
             background: transparent;
             color: white;
-            border: 2px solid white;
-            font-size: 16px;
+            border: none;
+            font-size: 24px;
             cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -328,8 +326,29 @@
         window.addEventListener('load', function() {
             const startupSound = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
             startupSound.volume = 0.3;
-            //startupSound.play();
+            startupSound.play();
         });
+
+        // Force drop-up behavior in full screen
+        document.addEventListener('fullscreenchange', adjustDropdown);
+        document.addEventListener('webkitfullscreenchange', adjustDropdown);
+        document.addEventListener('mozfullscreenchange', adjustDropdown);
+        document.addEventListener('MSFullscreenChange', adjustDropdown);
+
+        function adjustDropdown() {
+            if (document.fullscreenElement || 
+                document.webkitFullscreenElement || 
+                document.mozFullScreenElement ||
+                document.msFullscreenElement) {
+                // In full screen, ensure dropdown appears above
+                stationSelect.style.position = 'fixed';
+                stationSelect.style.bottom = '60px';
+            } else {
+                // Exit full screen, revert to normal
+                stationSelect.style.position = '';
+                //stationSelect.style.bottom = '';
+            }
+        }
     </script>
 </body>
 </html>
