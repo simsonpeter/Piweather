@@ -69,38 +69,38 @@
         }
         
         .radio-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
             display: flex;
-            justify-content: center;
             align-items: center;
-            padding: 10px;
             gap: 10px;
+            z-index: 100;
+        }
+        
+        .select-wrapper {
+            position: relative;
         }
         
         #station-select {
-            padding: 8px;
+            padding: 8px 25px 8px 10px;
             font-size: 16px;
             border-radius: 20px;
             background: rgba(255,255,255,0.2);
             color: white;
             border: none;
-            width: 60%;
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
         }
         
         /* Custom dropdown arrow */
-        .select-wrapper {
-            position: relative;
-            width: 60%;
-        }
-        
         .select-wrapper::after {
             content: "▼";
             font-size: 12px;
             color: white;
             position: absolute;
-            right: 15px;
+            right: 10px;
             top: 50%;
             transform: translateY(-50%);
             pointer-events: none;
@@ -108,26 +108,23 @@
         
         /* Dropdown options styling */
         #station-select option {
-            background-color: #333;
+            background-color: #000;
             color: white;
             padding: 10px;
         }
         
-        /* Force dropdown to show above other elements */
-        #station-select:focus {
-            position: relative;
-            z-index: 1000;
-        }
-        
         #play-btn {
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.2);
+            background: transparent;
             color: white;
-            border: none;
-            font-size: 20px;
+            border: 2px solid white;
+            font-size: 16px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .city-input {
@@ -151,13 +148,16 @@
         .city-input:focus {
             opacity: 1;
         }
-        
-        .controls-container {
-            position: relative;
-        }
     </style>
 </head>
 <body>
+    <div class="radio-controls">
+        <div class="select-wrapper">
+            <select id="station-select"></select>
+        </div>
+        <button id="play-btn">▶</button>
+    </div>
+
     <div class="clock-section">
         <div class="clock" id="clock">00:00</div>
     </div>
@@ -174,20 +174,12 @@
         </div>
     </div>
     
-    <div class="controls-container">
-        <div class="radio-controls">
-            <div class="select-wrapper">
-                <select id="station-select"></select>
-            </div>
-            <button id="play-btn">▶</button>
-        </div>
-        
-        <input type="text" class="city-input" id="city-input" placeholder="Enter city name">
-    </div>
+    <input type="text" class="city-input" id="city-input" placeholder="Enter city name">
 
     <audio id="radio-player"></audio>
 
     <script>
+        // [Previous JavaScript code remains exactly the same]
         // DOM Elements
         const clockEl = document.getElementById('clock');
         const weatherIcon = document.getElementById('weather-icon');
@@ -198,7 +190,6 @@
         const stationSelect = document.getElementById('station-select');
         const playBtn = document.getElementById('play-btn');
         const radioPlayer = document.getElementById('radio-player');
-        const radioControls = document.querySelector('.radio-controls');
         
         // State
         let isPlaying = false;
@@ -294,8 +285,7 @@
         
         // Event listeners
         document.body.addEventListener('click', function(e) {
-            // Only show city input if clicking outside radio controls
-            if (!radioControls.contains(e.target) && e.target !== cityInput) {
+            if (e.target !== cityInput && e.target !== stationSelect && e.target !== playBtn) {
                 cityInput.focus();
             }
         });
@@ -307,30 +297,17 @@
                     getWeather(city);
                     this.blur();
                     this.value = '';
-                    this.style.opacity = '0';
                 }
             }
         });
         
-        cityInput.addEventListener('blur', function() {
-            this.style.opacity = '0';
-        });
+        playBtn.addEventListener('click', togglePlayback);
         
-        playBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            togglePlayback();
-        });
-        
-        stationSelect.addEventListener('change', function(e) {
-            e.stopPropagation();
+        stationSelect.addEventListener('change', function() {
             if (isPlaying) {
                 togglePlayback();
                 togglePlayback();
             }
-        });
-        
-        stationSelect.addEventListener('click', function(e) {
-            e.stopPropagation();
         });
         
         // Initialize
