@@ -243,6 +243,7 @@
             font-size: 3vh;
             cursor: pointer;
             opacity: 0.7;
+            z-index: 1001; /* Make sure it's above other elements */
         }
         
         .settings-panel {
@@ -651,11 +652,25 @@
         
         // Event listeners
         function setupEventListeners() {
+            // Main click handler for focusing city input
             document.body.addEventListener('click', function(e) {
-                if (e.target !== cityInput && e.target !== stationSelect && 
-                    e.target !== playBtn && e.target !== volumeBtn && 
-                    e.target !== volumeSlider && e.target !== settingsBtn &&
-                    !settingsPanel.contains(e.target)) {
+                // Check if click is on any of these elements
+                const interactiveElements = [
+                    cityInput,
+                    stationSelect,
+                    playBtn,
+                    volumeBtn,
+                    volumeSlider,
+                    settingsBtn
+                ];
+                
+                // Check if click is inside settings panel
+                const isSettingsClick = settingsPanel.contains(e.target);
+                
+                // Check if click is on any interactive element
+                const isInteractiveClick = interactiveElements.some(el => el.contains(e.target));
+                
+                if (!isInteractiveClick && !isSettingsClick) {
                     cityInput.focus();
                     
                     if (countdownTimer) {
@@ -698,9 +713,17 @@
                 this.textContent = radioPlayer.muted ? '🔇' : '🔊';
             });
             
+            // Settings button handler - stops propagation to prevent body click handler
             settingsBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
+            });
+            
+            // Close settings when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!settingsPanel.contains(e.target) && e.target !== settingsBtn) {
+                    settingsPanel.style.display = 'none';
+                }
             });
             
             clockFormatSelect.addEventListener('change', function() {
