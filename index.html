@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Remote Clock, Weather & Radio Web App">
-    <title>Remote Clock, Weather & Radio</title>
+    <title>Clock, Weather & Radio</title>
     <style>
         * {
             margin: 0;
@@ -54,8 +53,6 @@
         .weather-icon {
             width: 35vw;
             height: 35vw;
-            max-width: 200px;
-            max-height: 200px;
         }
         
         .temp-display {
@@ -99,6 +96,7 @@
             width: 200px;
         }
         
+        /* Custom dropdown arrow */
         .select-wrapper::after {
             content: "▼";
             font-size: 12px;
@@ -110,12 +108,14 @@
             pointer-events: none;
         }
         
+        /* Dropdown options styling */
         #station-select option {
             background-color: #000;
             color: white;
             padding: 10px;
         }
         
+        /* Force dropdown to show above other elements in full screen */
         #station-select:focus {
             position: relative;
             z-index: 1000;
@@ -164,19 +164,6 @@
             transform: translateX(-50%);
             font-size: 2vh;
             color: rgba(255,255,255,0.7);
-        }
-
-        @media (max-width: 768px) {
-            .clock {
-                font-size: 20vh;
-            }
-            .temp-display {
-                font-size: 10vh;
-            }
-            .weather-icon {
-                width: 25vw;
-                height: 25vw;
-            }
         }
     </style>
 </head>
@@ -246,45 +233,37 @@
             }
             
             const apiKey = '03f98efcfade4eccb3bb0689975585d5';
-            const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&units=metric&appid=${apiKey}`;
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
             
             try {
                 const response = await fetch(url);
                 const data = await response.json();
                 
                 if (data.cod === 200) {
+                    // Update display
                     tempEl.textContent = `${Math.round(data.main.temp)}°`;
                     humidityEl.textContent = data.main.humidity;
                     windEl.textContent = Math.round(data.wind.speed * 3.6);
                     
+                    // Show weather icon
                     weatherIcon.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`;
                     weatherIcon.style.display = 'block';
                     
+                    // Save city
                     localStorage.setItem('weatherCity', city);
-                } else {
-                    throw new Error(data.message || 'Weather data not available');
                 }
             } catch (error) {
                 console.error('Error fetching weather:', error);
-                tempEl.textContent = '--°';
-                weatherIcon.style.display = 'none';
             }
         }
         
         // Radio functions
         async function loadStations() {
             try {
-                // Using a CORS proxy to avoid potential CORS issues
-                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-                const targetUrl = 'https://raw.githubusercontent.com/simsonpeter/Tcradios/main/stations.json';
-                const response = await fetch(proxyUrl + targetUrl, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                });
-                
+                const response = await fetch('https://raw.githubusercontent.com/simsonpeter/Tcradios/refs/heads/main/stations.json');
                 stations = await response.json();
                 
+                // Populate dropdown
                 stationSelect.innerHTML = '';
                 stations.forEach(station => {
                     const option = document.createElement('option');
@@ -293,14 +272,15 @@
                     stationSelect.appendChild(option);
                 });
                 
+                // Load last played station if available
                 const lastStation = localStorage.getItem('lastRadioStation');
                 if (lastStation) {
                     stationSelect.value = lastStation;
+                    // Start 15-second countdown to autoplay
                     startCountdown(lastStation);
                 }
             } catch (error) {
                 console.error('Error loading stations:', error);
-                countdownEl.textContent = 'Failed to load stations. Refresh to try again.';
             }
         }
 
@@ -353,6 +333,7 @@
             if (e.target !== cityInput && e.target !== stationSelect && e.target !== playBtn) {
                 cityInput.focus();
                 
+                // If countdown is running and user clicks, cancel it and play immediately
                 if (countdownTimer) {
                     clearInterval(countdownTimer);
                     countdownEl.textContent = '';
@@ -379,6 +360,7 @@
         
         stationSelect.addEventListener('change', function() {
             if (isPlaying) {
+                // If already playing, stop current and start new station
                 radioPlayer.pause();
                 playStation(this.value);
             }
@@ -389,15 +371,25 @@
         loadStations();
         getWeather();
 
-        // Handle service worker registration for PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').then(registration => {
-                    console.log('ServiceWorker registration successful');
-                }).catch(err => {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
-            });
+        // Force drop-up behavior in full screen
+        document.addEventListener('fullscreenchange', adjustDropdown);
+        document.addEventListener('webkitfullscreenchange', adjustDropdown);
+        document.addEventListener('mozfullscreenchange', adjustDropdown);
+        document.addEventListener('MSFullscreenChange', adjustDropdown);
+
+        function adjustDropdown() {
+            if (document.fullscreenElement || 
+                document.webkitFullscreenElement || 
+                document.mozFullScreenElement ||
+                document.msFullscreenElement) {
+                // In full screen, ensure dropdown appears above
+                stationSelect.style.position = 'fixed';
+                stationSelect.style.bottom = '60px';
+            } else {
+                // Exit full screen, revert to normal
+                stationSelect.style.position = '';
+                stationSelect.style.bottom = '';
+            }
         }
     </script>
 </body>
