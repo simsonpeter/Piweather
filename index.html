@@ -34,7 +34,6 @@
         .clock {
             font-size: 20vh;
             font-weight: bold;
-            text-shadow: 0 0 20px #0ff;
             line-height: 0.9;
         }
         
@@ -243,7 +242,7 @@
             font-size: 3vh;
             cursor: pointer;
             opacity: 0.7;
-            z-index: 1001; /* Make sure it's above other elements */
+            z-index: 1001;
         }
         
         .settings-panel {
@@ -255,16 +254,59 @@
             border-radius: 10px;
             display: none;
             z-index: 1000;
+            width: 300px;
         }
         
         .settings-option {
             margin: 10px 0;
             display: flex;
             align-items: center;
+            justify-content: space-between;
         }
         
         .settings-option label {
             margin-right: 10px;
+        }
+        
+        .timer-container {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .timer-display {
+            font-size: 2.5vh;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .timer-controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        
+        .timer-input {
+            flex: 1;
+            padding: 8px;
+            border-radius: 5px;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-align: center;
+        }
+        
+        .timer-btn {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            cursor: pointer;
+        }
+        
+        .timer-btn:hover {
+            background: rgba(255,255,255,0.3);
         }
     </style>
 </head>
@@ -286,6 +328,21 @@
                 <option value="dark">Dark</option>
                 <option value="blue">Blue</option>
             </select>
+        </div>
+        
+        <div class="timer-container">
+            <h3>Timer</h3>
+            <div class="timer-display" id="timer-display">00:00:00</div>
+            <div class="timer-controls">
+                <input type="number" class="timer-input" id="timer-hours" placeholder="H" min="0" max="23">
+                <input type="number" class="timer-input" id="timer-minutes" placeholder="M" min="0" max="59">
+                <input type="number" class="timer-input" id="timer-seconds" placeholder="S" min="0" max="59">
+            </div>
+            <div class="timer-controls">
+                <button class="timer-btn" id="timer-start">Start</button>
+                <button class="timer-btn" id="timer-pause">Pause</button>
+                <button class="timer-btn" id="timer-reset">Reset</button>
+            </div>
         </div>
     </div>
     
@@ -364,6 +421,15 @@
         const clockFormatSelect = document.getElementById('clock-format');
         const themeSelect = document.getElementById('theme-select');
         
+        // Timer elements
+        const timerDisplay = document.getElementById('timer-display');
+        const timerHours = document.getElementById('timer-hours');
+        const timerMinutes = document.getElementById('timer-minutes');
+        const timerSeconds = document.getElementById('timer-seconds');
+        const timerStartBtn = document.getElementById('timer-start');
+        const timerPauseBtn = document.getElementById('timer-pause');
+        const timerResetBtn = document.getElementById('timer-reset');
+        
         // State
         let isPlaying = false;
         let stations = [];
@@ -371,6 +437,11 @@
         let countdownTimer = null;
         let clockFormat = '24h';
         let currentTheme = 'default';
+        
+        // Timer state
+        let timerInterval = null;
+        let timerTime = 0;
+        let isTimerRunning = false;
         
         // Date formatting
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -426,6 +497,7 @@
             getWeather();
             fetchQuote();
             setupEventListeners();
+            setupTimer();
         }
         
         // Clock function
@@ -643,11 +715,78 @@
             
             document.body.style.backgroundColor = theme.background;
             document.body.style.color = theme.text;
-            clockEl.style.textShadow = `0 0 20px ${theme.accent}`;
             
             // Update other elements as needed
             currentTheme = themeName;
             localStorage.setItem('theme', themeName);
+        }
+        
+        // Timer functions
+        function setupTimer() {
+            timerStartBtn.addEventListener('click', startTimer);
+            timerPauseBtn.addEventListener('click', pauseTimer);
+            timerResetBtn.addEventListener('click', resetTimer);
+            
+            // Input validation
+            [timerHours, timerMinutes, timerSeconds].forEach(input => {
+                input.addEventListener('input', function() {
+                    if (this.value < 0) this.value = 0;
+                    if (this.id === 'timer-hours' && this.value > 23) this.value = 23;
+                    if ((this.id === 'timer-minutes' || this.id === 'timer-seconds') && this.value > 59) this.value = 59;
+                });
+            });
+        }
+        
+        function startTimer() {
+            if (isTimerRunning) return;
+            
+            // Get values from inputs
+            const hours = parseInt(timerHours.value) || 0;
+            const minutes = parseInt(timerMinutes.value) || 0;
+            const seconds = parseInt(timerSeconds.value) || 0;
+            
+            // Calculate total seconds
+            timerTime = hours * 3600 + minutes * 60 + seconds;
+            
+            if (timerTime <= 0) return;
+            
+            isTimerRunning = true;
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                timerTime--;
+                updateTimerDisplay();
+                
+                if (timerTime <= 0) {
+                    clearInterval(timerInterval);
+                    isTimerRunning = false;
+                    // Optional: Add alarm sound here
+                }
+            }, 1000);
+        }
+        
+        function pauseTimer() {
+            if (!isTimerRunning) return;
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+        }
+        
+        function resetTimer() {
+            pauseTimer();
+            timerTime = 0;
+            timerHours.value = '';
+            timerMinutes.value = '';
+            timerSeconds.value = '';
+            updateTimerDisplay();
+        }
+        
+        function updateTimerDisplay() {
+            const hours = Math.floor(timerTime / 3600);
+            const minutes = Math.floor((timerTime % 3600) / 60);
+            const seconds = timerTime % 60;
+            
+            timerDisplay.textContent = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
         
         // Event listeners
@@ -661,7 +800,13 @@
                     playBtn,
                     volumeBtn,
                     volumeSlider,
-                    settingsBtn
+                    settingsBtn,
+                    timerHours,
+                    timerMinutes,
+                    timerSeconds,
+                    timerStartBtn,
+                    timerPauseBtn,
+                    timerResetBtn
                 ];
                 
                 // Check if click is inside settings panel
