@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhanced Dashboard</title>
+    <title>Colorful Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -13,8 +13,8 @@
         
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #000000;
-            color: white;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #e6e6e6;
             width: 100vw;
             height: 100vh;
             overflow: hidden;
@@ -34,13 +34,15 @@
         .clock {
             font-size: 20vh;
             font-weight: bold;
+            color: #4cc9f0;
             line-height: 0.9;
+            text-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
         }
         
         .date {
             font-size: 3vh;
             margin-top: 1vh;
-            opacity: 0.8;
+            color: #a5b4fc;
         }
         
         .greeting {
@@ -48,7 +50,7 @@
             top: 20px;
             left: 20px;
             font-size: 3vh;
-            opacity: 0.9;
+            color: #f8f9fa;
         }
         
         .weather-section {
@@ -56,6 +58,10 @@
             display: flex;
             flex-direction: column;
             padding: 10px;
+            background: rgba(30, 39, 73, 0.4);
+            border-radius: 15px;
+            margin: 0 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         
         .weather-main {
@@ -68,12 +74,15 @@
         .weather-icon {
             width: 25vw;
             height: 25vw;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
         }
         
         .temp-display {
             font-size: 12vh;
             font-weight: bold;
             margin-left: 5vw;
+            color: #f72585;
+            text-shadow: 0 0 10px rgba(247, 37, 133, 0.3);
         }
         
         .weather-details {
@@ -81,6 +90,7 @@
             justify-content: space-around;
             font-size: 3vh;
             margin-top: 2vh;
+            color: #90e0ef;
         }
         
         .weather-extra {
@@ -88,7 +98,7 @@
             justify-content: space-around;
             font-size: 2.5vh;
             margin-top: 1vh;
-            opacity: 0.8;
+            color: #caf0f8;
         }
         
         .radio-controls {
@@ -100,9 +110,11 @@
             align-items: center;
             gap: 10px;
             z-index: 100;
-            background: rgba(0,0,0,0.7);
+            background: rgba(33, 42, 82, 0.9);
             padding: 10px 20px;
             border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(76, 201, 240, 0.2);
         }
         
         .select-wrapper {
@@ -113,9 +125,9 @@
             padding: 8px 25px 8px 10px;
             font-size: 16px;
             border-radius: 20px;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
             color: white;
-            border: none;
+            border: 1px solid rgba(76, 201, 240, 0.3);
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
@@ -125,7 +137,7 @@
         .select-wrapper::after {
             content: "▼";
             font-size: 12px;
-            color: white;
+            color: #4cc9f0;
             position: absolute;
             right: 10px;
             top: 50%;
@@ -134,14 +146,14 @@
         }
         
         #station-select option {
-            background-color: #000;
+            background-color: #1a1a2e;
             color: white;
             padding: 10px;
         }
         
         #play-btn, #volume-btn {
             background: transparent;
-            color: white;
+            color: #4cc9f0;
             border: none;
             font-size: 24px;
             cursor: pointer;
@@ -151,6 +163,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: transform 0.2s;
+        }
+        
+        #play-btn:hover, #volume-btn:hover {
+            transform: scale(1.1);
+            color: #f72585;
         }
         
         .volume-control {
@@ -164,6 +182,7 @@
             width: 80px;
             opacity: 0;
             transition: opacity 0.3s;
+            accent-color: #4cc9f0;
         }
         
         .volume-control:hover #volume-slider {
@@ -179,13 +198,15 @@
             font-size: 3vh;
             border: none;
             border-radius: 50px;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(33, 42, 82, 0.9);
             color: white;
             text-align: center;
             outline: none;
             width: 90%;
             opacity: 0;
             transition: opacity 0.3s;
+            border: 1px solid rgba(76, 201, 240, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
         
         .city-input:focus {
@@ -198,7 +219,7 @@
             left: 50%;
             transform: translateX(-50%);
             font-size: 2vh;
-            color: rgba(255,255,255,0.7);
+            color: #90e0ef;
         }
         
         .quote-container {
@@ -210,7 +231,8 @@
             text-align: center;
             font-size: 2.2vh;
             font-style: italic;
-            opacity: 0.7;
+            color: #a5b4fc;
+            text-shadow: 0 0 5px rgba(165, 180, 252, 0.3);
         }
         
         .forecast {
@@ -224,6 +246,11 @@
             flex-direction: column;
             align-items: center;
             font-size: 2vh;
+            color: #caf0f8;
+            background: rgba(33, 42, 82, 0.4);
+            padding: 10px;
+            border-radius: 10px;
+            min-width: 15%;
         }
         
         .forecast-icon {
@@ -236,25 +263,36 @@
             position: absolute;
             top: 20px;
             right: 20px;
-            background: transparent;
-            color: white;
+            background: rgba(33, 42, 82, 0.7);
+            color: #4cc9f0;
             border: none;
             font-size: 3vh;
             cursor: pointer;
-            opacity: 0.7;
+            padding: 5px 10px;
+            border-radius: 50%;
             z-index: 1001;
+            transition: all 0.3s;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(76, 201, 240, 0.3);
+        }
+        
+        .settings-btn:hover {
+            background: rgba(76, 201, 240, 0.2);
+            transform: rotate(90deg);
         }
         
         .settings-panel {
             position: absolute;
             top: 60px;
             right: 20px;
-            background: rgba(0,0,0,0.8);
+            background: rgba(33, 42, 82, 0.95);
             padding: 15px;
             border-radius: 10px;
             display: none;
             z-index: 1000;
             width: 300px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(76, 201, 240, 0.3);
         }
         
         .settings-option {
@@ -262,22 +300,33 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            color: #caf0f8;
         }
         
         .settings-option label {
             margin-right: 10px;
         }
         
+        select {
+            background: rgba(26, 26, 46, 0.8);
+            color: white;
+            border: 1px solid rgba(76, 201, 240, 0.3);
+            padding: 5px;
+            border-radius: 5px;
+        }
+        
         .timer-container {
             margin-top: 15px;
             padding-top: 15px;
-            border-top: 1px solid rgba(255,255,255,0.2);
+            border-top: 1px solid rgba(76, 201, 240, 0.3);
         }
         
         .timer-display {
             font-size: 2.5vh;
             text-align: center;
             margin: 10px 0;
+            color: #4cc9f0;
+            font-family: monospace;
         }
         
         .timer-controls {
@@ -290,8 +339,8 @@
             flex: 1;
             padding: 8px;
             border-radius: 5px;
-            border: none;
-            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(76, 201, 240, 0.3);
+            background: rgba(26, 26, 46, 0.8);
             color: white;
             text-align: center;
         }
@@ -300,13 +349,45 @@
             padding: 8px 15px;
             border-radius: 5px;
             border: none;
-            background: rgba(255,255,255,0.2);
-            color: white;
+            background: rgba(76, 201, 240, 0.2);
+            color: #caf0f8;
             cursor: pointer;
+            transition: all 0.2s;
         }
         
         .timer-btn:hover {
-            background: rgba(255,255,255,0.3);
+            background: rgba(76, 201, 240, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        #timer-start {
+            background: rgba(72, 199, 116, 0.3);
+        }
+        
+        #timer-pause {
+            background: rgba(249, 199, 79, 0.3);
+        }
+        
+        #timer-reset {
+            background: rgba(239, 71, 111, 0.3);
+        }
+        
+        .timer-alert {
+            color: #f72585;
+            font-weight: bold;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        h3 {
+            color: #4cc9f0;
+            margin-bottom: 10px;
+            text-align: center;
         }
     </style>
 </head>
@@ -331,7 +412,7 @@
         </div>
         
         <div class="timer-container">
-            <h3>Timer</h3>
+            <h3>Sleep Timer</h3>
             <div class="timer-display" id="timer-display">00:00:00</div>
             <div class="timer-controls">
                 <input type="number" class="timer-input" id="timer-hours" placeholder="H" min="0" max="23">
@@ -450,25 +531,25 @@
         // Themes
         const themes = {
             default: {
-                background: '#000000',
-                text: '#ffffff',
-                accent: '#0ff',
-                name: 'Default Dark'
+                background: 'linear-gradient(135deg, #1a1a2e, #16213e)',
+                text: '#e6e6e6',
+                accent: '#4cc9f0',
+                name: 'Default'
             },
             light: {
-                background: '#f5f5f5',
-                text: '#333333',
-                accent: '#0066cc',
+                background: 'linear-gradient(135deg, #f8f9fa, #e9ecef)',
+                text: '#495057',
+                accent: '#4895ef',
                 name: 'Light'
             },
             dark: {
-                background: '#121212',
+                background: 'linear-gradient(135deg, #121212, #1e1e1e)',
                 text: '#e0e0e0',
                 accent: '#bb86fc',
                 name: 'Dark'
             },
             blue: {
-                background: '#001f3f',
+                background: 'linear-gradient(135deg, #001f3f, #003366)',
                 text: '#ffffff',
                 accent: '#7FDBFF',
                 name: 'Blue'
@@ -713,7 +794,7 @@
             const theme = themes[themeName];
             if (!theme) return;
             
-            document.body.style.backgroundColor = theme.background;
+            document.body.style.background = theme.background;
             document.body.style.color = theme.text;
             
             // Update other elements as needed
@@ -760,7 +841,14 @@
                 if (timerTime <= 0) {
                     clearInterval(timerInterval);
                     isTimerRunning = false;
-                    // Optional: Add alarm sound here
+                    // Stop the radio when timer reaches zero
+                    if (isPlaying) {
+                        togglePlayback();
+                    }
+                    timerDisplay.classList.add('timer-alert');
+                    setTimeout(() => {
+                        timerDisplay.classList.remove('timer-alert');
+                    }, 3000);
                 }
             }, 1000);
         }
