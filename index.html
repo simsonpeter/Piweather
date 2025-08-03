@@ -18,6 +18,52 @@
             height: 100vh;
             overflow: hidden;
             background: linear-gradient(135deg, #0f172a, #1e293b);
+            transition: background 0.3s ease;
+        }
+        
+        /* Theme Styles */
+        .theme-default {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+        }
+        
+        .theme-black {
+            background: linear-gradient(135deg, #000000, #111111);
+            color: #f0f0f0;
+        }
+        
+        .theme-black .clock {
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+        
+        .theme-black .weather-section,
+        .theme-black .radio-controls,
+        .theme-black .city-input {
+            background: rgba(0, 0, 0, 0.7);
+        }
+        
+        .theme-black .settings-panel {
+            background: rgba(0, 0, 0, 0.95);
+        }
+        
+        .theme-blue {
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            color: #ffffff;
+        }
+        
+        .theme-blue .clock {
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+        
+        .theme-blue .weather-section,
+        .theme-blue .radio-controls,
+        .theme-blue .city-input {
+            background: rgba(26, 41, 128, 0.7);
+        }
+        
+        .theme-blue .settings-panel {
+            background: rgba(26, 41, 128, 0.95);
         }
         
         /* Main layout container */
@@ -561,6 +607,9 @@
                 currentTheme = savedTheme;
                 themeSelect.value = savedTheme;
                 applyTheme(savedTheme);
+            } else {
+                // Apply default theme if no saved theme
+                applyTheme('default');
             }
             
             updateClock();
