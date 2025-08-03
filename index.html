@@ -17,43 +17,48 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Center everything horizontally */
-            transition: all 0.3s ease;
             background: linear-gradient(135deg, #0f172a, #1e293b);
         }
         
-        /* Main container for centering content */
-        .container {
-            width: 100%;
-            max-width: 800px; /* Limit width for better centering */
+        /* Main layout container */
+        .dashboard {
             display: flex;
             flex-direction: column;
-            align-items: center;
+            height: 100%;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
             padding: 10px;
         }
         
+        /* Top section with clock and weather */
+        .top-section {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        
+        /* Clock section - now larger and centered */
         .clock-section {
-            width: 100%;
+            flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             position: relative;
-            padding: 10px 0;
+            padding: 20px 0;
         }
         
         .clock {
-            font-size: 15vh; /* Slightly smaller for 7-inch */
+            font-size: 18vh;
             font-weight: bold;
             color: #4cc9f0;
-            line-height: 0.9;
             text-shadow: 0 0 15px rgba(76, 201, 240, 0.5);
+            line-height: 1;
         }
         
         .date {
-            font-size: 2.5vh;
+            font-size: 3.5vh;
             margin-top: 1vh;
             color: #a5b4fc;
         }
@@ -62,20 +67,18 @@
             position: absolute;
             top: 10px;
             left: 10px;
-            font-size: 2.5vh;
+            font-size: 3vh;
             color: #f8f9fa;
         }
         
+        /* Weather section - larger and properly spaced */
         .weather-section {
-            width: 95%;
+            flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 10px;
+            padding: 15px;
             background: rgba(15, 23, 42, 0.7);
             border-radius: 15px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(76, 201, 240, 0.1);
             margin: 10px 0;
         }
         
@@ -87,13 +90,13 @@
         }
         
         .weather-icon {
-            width: 20vh;
-            height: 20vh;
+            width: 25vh;
+            height: 25vh;
             filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
         }
         
         .temp-display {
-            font-size: 10vh;
+            font-size: 12vh;
             font-weight: bold;
             margin-left: 5vw;
             color: #f72585;
@@ -103,7 +106,7 @@
         .weather-details {
             display: flex;
             justify-content: space-around;
-            font-size: 2.5vh;
+            font-size: 3vh;
             margin-top: 1vh;
             color: #90e0ef;
         }
@@ -111,27 +114,66 @@
         .weather-extra {
             display: flex;
             justify-content: space-around;
-            font-size: 2vh;
+            font-size: 2.5vh;
             margin-top: 1vh;
             color: #caf0f8;
         }
         
+        .forecast {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 2vh;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .forecast-day {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 2vh;
+            background: rgba(30, 41, 59, 0.5);
+            padding: 8px;
+            border-radius: 8px;
+            min-width: 18%;
+        }
+        
+        .forecast-icon {
+            width: 6vh;
+            height: 6vh;
+            margin: 5px 0;
+        }
+        
+        /* Bottom section with controls */
+        .bottom-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: auto;
+        }
+        
+        .quote-container {
+            text-align: center;
+            font-size: 2.2vh;
+            font-style: italic;
+            color: #a5b4fc;
+            margin: 10px 0;
+            padding: 0 10px;
+            text-shadow: 0 0 5px rgba(165, 180, 252, 0.3);
+        }
+        
         .radio-controls {
-            position: fixed;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%);
             display: flex;
             align-items: center;
             gap: 10px;
-            z-index: 100;
             background: rgba(15, 23, 42, 0.9);
-            padding: 10px 20px;
+            padding: 12px 20px;
             border-radius: 50px;
+            margin: 10px 0;
+            width: 100%;
+            max-width: 500px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
             border: 1px solid rgba(76, 201, 240, 0.2);
-            width: 90%;
-            max-width: 400px;
         }
         
         .select-wrapper {
@@ -166,7 +208,7 @@
         #play-btn, #volume-btn {
             background: transparent;
             border: none;
-            font-size: 20px;
+            font-size: 24px;
             cursor: pointer;
             padding: 0;
             width: 30px;
@@ -174,12 +216,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
             color: #4cc9f0;
-        }
-        
-        #play-btn:hover, #volume-btn:hover {
-            transform: scale(1.1);
         }
         
         .volume-control {
@@ -189,21 +226,11 @@
         }
         
         #volume-slider {
-            width: 60px;
-            opacity: 0;
-            transition: opacity 0.3s;
+            width: 80px;
             accent-color: #4cc9f0;
         }
         
-        .volume-control:hover #volume-slider {
-            opacity: 1;
-        }
-        
         .city-input {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
             padding: 10px 15px;
             font-size: 16px;
             border: none;
@@ -213,11 +240,12 @@
             outline: none;
             width: 80%;
             max-width: 400px;
-            opacity: 0;
-            transition: all 0.3s;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(76, 201, 240, 0.3);
+            margin: 10px 0;
             background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(76, 201, 240, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
         
         .city-input:focus {
@@ -225,58 +253,13 @@
         }
 
         .countdown {
-            position: fixed;
-            bottom: 70px;
-            left: 50%;
-            transform: translateX(-50%);
             font-size: 16px;
             color: #90e0ef;
             text-align: center;
-            width: 100%;
-        }
-        
-        .quote-container {
-            position: fixed;
-            bottom: 140px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 500px;
-            text-align: center;
-            font-size: 16px;
-            font-style: italic;
-            color: #a5b4fc;
-            text-shadow: 0 0 5px rgba(165, 180, 252, 0.3);
-            padding: 0 10px;
-        }
-        
-        .forecast {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 10px;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-        
-        .forecast-day {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 16px;
-            background: rgba(30, 41, 59, 0.5);
-            padding: 8px;
-            border-radius: 8px;
-            min-width: 18%;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(76, 201, 240, 0.1);
-        }
-        
-        .forecast-icon {
-            width: 40px;
-            height: 40px;
             margin: 5px 0;
         }
         
+        /* Settings */
         .settings-btn {
             position: fixed;
             top: 10px;
@@ -288,7 +271,6 @@
             padding: 5px;
             border-radius: 50%;
             z-index: 1001;
-            transition: all 0.3s;
             background: rgba(15, 23, 42, 0.7);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(76, 201, 240, 0.3);
@@ -297,11 +279,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-        
-        .settings-btn:hover {
-            background: rgba(76, 201, 240, 0.2);
-            transform: rotate(90deg);
         }
         
         .settings-panel {
@@ -313,11 +290,10 @@
             display: none;
             z-index: 1000;
             width: 280px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(76, 201, 240, 0.3);
-            backdrop-filter: blur(5px);
             background: rgba(15, 23, 42, 0.95);
             color: #caf0f8;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(76, 201, 240, 0.3);
         }
         
         .settings-option {
@@ -329,16 +305,6 @@
         
         .settings-option label {
             margin-right: 10px;
-            font-size: 14px;
-        }
-        
-        select {
-            padding: 5px;
-            border-radius: 5px;
-            background: rgba(26, 26, 46, 0.8);
-            color: white;
-            border: 1px solid rgba(76, 201, 240, 0.3);
-            font-size: 14px;
         }
         
         .timer-container {
@@ -359,7 +325,6 @@
             display: flex;
             justify-content: space-between;
             gap: 5px;
-            margin-top: 10px;
         }
         
         .timer-input {
@@ -370,7 +335,6 @@
             text-align: center;
             background: rgba(30, 41, 59, 0.8);
             color: white;
-            font-size: 14px;
         }
         
         .timer-btn {
@@ -378,12 +342,6 @@
             border-radius: 5px;
             border: none;
             cursor: pointer;
-            transition: all 0.2s;
-            font-size: 14px;
-        }
-        
-        .timer-btn:hover {
-            transform: translateY(-2px);
         }
         
         #timer-start {
@@ -413,75 +371,40 @@
             100% { opacity: 1; }
         }
         
-        h3 {
-            margin-bottom: 10px;
-            text-align: center;
-            font-size: 16px;
-            color: #4cc9f0;
-        }
-
-        /* Landscape mode adjustments */
+        /* Landscape mode */
         @media (orientation: landscape) {
-            .container {
+            .top-section {
                 flex-direction: row;
-                flex-wrap: wrap;
-                justify-content: center;
-                align-items: flex-start;
-                padding-top: 20px;
+                gap: 10px;
             }
             
             .clock-section {
-                width: 45%;
-                order: 1;
-                padding-top: 20px;
+                width: 50%;
+                padding: 0;
             }
             
             .weather-section {
-                width: 45%;
-                order: 2;
-                margin-top: 20px;
-                height: auto;
-            }
-            
-            .quote-container {
-                position: static;
-                order: 3;
-                width: 90%;
-                transform: none;
-                margin: 15px 0;
-            }
-            
-            .radio-controls {
-                position: fixed;
-                bottom: 10px;
-                order: 4;
-            }
-            
-            .city-input {
-                bottom: 80px;
-            }
-            
-            .countdown {
-                bottom: 50px;
+                width: 50%;
+                margin: 0;
             }
             
             .clock {
-                font-size: 12vh;
+                font-size: 15vh;
             }
             
             .temp-display {
-                font-size: 8vh;
+                font-size: 10vh;
             }
             
             .weather-icon {
-                width: 15vh;
-                height: 15vh;
+                width: 20vh;
+                height: 20vh;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="dashboard">
         <button class="settings-btn" id="settings-btn">⚙️</button>
         <div class="settings-panel" id="settings-panel">
             <div class="settings-option">
@@ -516,52 +439,56 @@
             </div>
         </div>
         
-        <div class="clock-section">
-            <div class="greeting" id="greeting"></div>
-            <div class="clock" id="clock">00:00</div>
-            <div class="date" id="date"></div>
+        <div class="top-section">
+            <div class="clock-section">
+                <div class="greeting" id="greeting"></div>
+                <div class="clock" id="clock">00:00</div>
+                <div class="date" id="date"></div>
+            </div>
+            
+            <div class="weather-section">
+                <div class="weather-main">
+                    <img class="weather-icon" id="weather-icon" src="" alt="Weather Icon" style="display: none;">
+                    <div class="temp-display" id="temperature">--°</div>
+                </div>
+                
+                <div class="weather-details">
+                    <div>Humidity: <span id="humidity">--</span>%</div>
+                    <div>Wind: <span id="wind">--</span> km/h</div>
+                    <div>Feels: <span id="feels-like">--</span>°</div>
+                </div>
+                
+                <div class="weather-extra">
+                    <div>High: <span id="temp-max">--</span>°</div>
+                    <div>Low: <span id="temp-min">--</span>°</div>
+                    <div>Pressure: <span id="pressure">--</span> hPa</div>
+                </div>
+                
+                <div class="forecast" id="forecast">
+                    <!-- Forecast will be inserted here -->
+                </div>
+            </div>
         </div>
         
-        <div class="weather-section">
-            <div class="weather-main">
-                <img class="weather-icon" id="weather-icon" src="" alt="Weather Icon" style="display: none;">
-                <div class="temp-display" id="temperature">--°</div>
-            </div>
+        <div class="bottom-section">
+            <div class="quote-container" id="quote-container"></div>
             
-            <div class="weather-details">
-                <div>Humidity: <span id="humidity">--</span>%</div>
-                <div>Wind: <span id="wind">--</span> km/h</div>
-                <div>Feels: <span id="feels-like">--</span>°</div>
-            </div>
+            <div class="countdown" id="countdown"></div>
             
-            <div class="weather-extra">
-                <div>High: <span id="temp-max">--</span>°</div>
-                <div>Low: <span id="temp-min">--</span>°</div>
-                <div>Pressure: <span id="pressure">--</span> hPa</div>
-            </div>
+            <input type="text" class="city-input" id="city-input" placeholder="Enter city name">
             
-            <div class="forecast" id="forecast">
-                <!-- Forecast will be inserted here -->
+            <div class="radio-controls">
+                <div class="select-wrapper">
+                    <select id="station-select"></select>
+                </div>
+                <button id="play-btn">▶</button>
+                <div class="volume-control">
+                    <button id="volume-btn">🔊</button>
+                    <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.7">
+                </div>
             </div>
-        </div>
-        
-        <div class="quote-container" id="quote-container"></div>
-    </div>
-    
-    <div class="radio-controls">
-        <div class="select-wrapper">
-            <select id="station-select"></select>
-        </div>
-        <button id="play-btn">▶</button>
-        <div class="volume-control">
-            <button id="volume-btn">🔊</button>
-            <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.7">
         </div>
     </div>
-
-    <div class="countdown" id="countdown"></div>
-    
-    <input type="text" class="city-input" id="city-input" placeholder="Enter city name">
 
     <audio id="radio-player"></audio>
 
