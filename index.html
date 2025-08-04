@@ -30,12 +30,14 @@
             max-width: 800px;
             margin: 0 auto;
             padding: 10px;
+            overflow: hidden;
         }
         
         .top-section {
             display: flex;
             flex-direction: column;
             flex-grow: 1;
+            overflow: hidden;
         }
         
         .clock-section {
@@ -78,6 +80,7 @@
             background: rgba(15, 23, 42, 0.7);
             border-radius: 15px;
             margin: 10px 0;
+            overflow: hidden;
         }
         
         .weather-main {
@@ -98,7 +101,7 @@
             font-weight: bold;
             margin-left: 5vw;
             color: #f72585;
-            text-shadow: 0 0 10px rgba(247, 37, 133, 0.4);
+            text-shadow: 0 0 10px rgba(247, 37, 133, 0.4));
         }
         
         .weather-details {
@@ -147,6 +150,7 @@
             flex-direction: column;
             align-items: center;
             margin-top: auto;
+            overflow: hidden;
         }
         
         .quote-container {
@@ -440,6 +444,7 @@
             display: none;
             height: calc(100vh - 60px);
             overflow-y: auto;
+            overflow-x: hidden;
         }
 
         .tab-content.active {
@@ -452,6 +457,7 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
+            overflow: hidden;
         }
 
         .media-header {
@@ -580,6 +586,13 @@
             padding: 10px;
             margin-top: 10px;
             border: 1px solid rgba(76, 201, 240, 0.3);
+            position: fixed;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 40px);
+            max-width: 600px;
+            z-index: 200;
         }
 
         .keyboard-row {
@@ -592,22 +605,24 @@
         .keyboard-key {
             flex: 1;
             min-width: 30px;
-            height: 40px;
+            height: 50px;
             border: none;
             border-radius: 5px;
             background: rgba(30, 41, 59, 0.8);
             color: white;
-            font-size: 16px;
+            font-size: 18px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             touch-action: manipulation;
+            user-select: none;
         }
 
         .keyboard-key:active {
             background: #4cc9f0;
             color: #0f172a;
+            transform: scale(0.95);
         }
 
         .keyboard-key.space {
@@ -639,7 +654,7 @@
             color: white;
             font-size: 20px;
             cursor: pointer;
-            z-index: 101;
+            z-index: 201;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -666,6 +681,11 @@
             .keyboard-toggle {
                 bottom: 20px;
                 right: 20px;
+            }
+
+            .custom-keyboard {
+                bottom: 20px;
+                left: calc(50% + 30px);
             }
         }
     </style>
@@ -784,63 +804,6 @@
             <button id="media-search-btn"><i class="fas fa-search"></i> Search</button>
         </div>
         
-        <!-- Custom On-Screen Keyboard -->
-        <div class="custom-keyboard" id="custom-keyboard">
-            <div class="keyboard-row">
-                <button class="keyboard-key">1</button>
-                <button class="keyboard-key">2</button>
-                <button class="keyboard-key">3</button>
-                <button class="keyboard-key">4</button>
-                <button class="keyboard-key">5</button>
-                <button class="keyboard-key">6</button>
-                <button class="keyboard-key">7</button>
-                <button class="keyboard-key">8</button>
-                <button class="keyboard-key">9</button>
-                <button class="keyboard-key">0</button>
-                <button class="keyboard-key backspace"><i class="fas fa-backspace"></i></button>
-            </div>
-            <div class="keyboard-row">
-                <button class="keyboard-key">q</button>
-                <button class="keyboard-key">w</button>
-                <button class="keyboard-key">e</button>
-                <button class="keyboard-key">r</button>
-                <button class="keyboard-key">t</button>
-                <button class="keyboard-key">y</button>
-                <button class="keyboard-key">u</button>
-                <button class="keyboard-key">i</button>
-                <button class="keyboard-key">o</button>
-                <button class="keyboard-key">p</button>
-            </div>
-            <div class="keyboard-row">
-                <button class="keyboard-key">a</button>
-                <button class="keyboard-key">s</button>
-                <button class="keyboard-key">d</button>
-                <button class="keyboard-key">f</button>
-                <button class="keyboard-key">g</button>
-                <button class="keyboard-key">h</button>
-                <button class="keyboard-key">j</button>
-                <button class="keyboard-key">k</button>
-                <button class="keyboard-key">l</button>
-                <button class="keyboard-key enter">Enter</button>
-            </div>
-            <div class="keyboard-row">
-                <button class="keyboard-key shift">Shift</button>
-                <button class="keyboard-key">z</button>
-                <button class="keyboard-key">x</button>
-                <button class="keyboard-key">c</button>
-                <button class="keyboard-key">v</button>
-                <button class="keyboard-key">b</button>
-                <button class="keyboard-key">n</button>
-                <button class="keyboard-key">m</button>
-                <button class="keyboard-key">,</button>
-                <button class="keyboard-key">.</button>
-                <button class="keyboard-key">/</button>
-            </div>
-            <div class="keyboard-row">
-                <button class="keyboard-key space">Space</button>
-            </div>
-        </div>
-        
         <div class="search-results" id="search-results"></div>
         
         <div class="youtube-container">
@@ -856,6 +819,63 @@
             <button class="media-btn" id="media-play"><i class="fas fa-play"></i></button>
             <button class="media-btn" id="media-next"><i class="fas fa-step-forward"></i></button>
             <button class="media-btn" id="media-volume"><i class="fas fa-volume-up"></i></button>
+        </div>
+    </div>
+
+    <!-- Custom On-Screen Keyboard -->
+    <div class="custom-keyboard" id="custom-keyboard">
+        <div class="keyboard-row">
+            <button class="keyboard-key">1</button>
+            <button class="keyboard-key">2</button>
+            <button class="keyboard-key">3</button>
+            <button class="keyboard-key">4</button>
+            <button class="keyboard-key">5</button>
+            <button class="keyboard-key">6</button>
+            <button class="keyboard-key">7</button>
+            <button class="keyboard-key">8</button>
+            <button class="keyboard-key">9</button>
+            <button class="keyboard-key">0</button>
+            <button class="keyboard-key backspace"><i class="fas fa-backspace"></i></button>
+        </div>
+        <div class="keyboard-row">
+            <button class="keyboard-key">q</button>
+            <button class="keyboard-key">w</button>
+            <button class="keyboard-key">e</button>
+            <button class="keyboard-key">r</button>
+            <button class="keyboard-key">t</button>
+            <button class="keyboard-key">y</button>
+            <button class="keyboard-key">u</button>
+            <button class="keyboard-key">i</button>
+            <button class="keyboard-key">o</button>
+            <button class="keyboard-key">p</button>
+        </div>
+        <div class="keyboard-row">
+            <button class="keyboard-key">a</button>
+            <button class="keyboard-key">s</button>
+            <button class="keyboard-key">d</button>
+            <button class="keyboard-key">f</button>
+            <button class="keyboard-key">g</button>
+            <button class="keyboard-key">h</button>
+            <button class="keyboard-key">j</button>
+            <button class="keyboard-key">k</button>
+            <button class="keyboard-key">l</button>
+            <button class="keyboard-key enter">Enter</button>
+        </div>
+        <div class="keyboard-row">
+            <button class="keyboard-key shift">Shift</button>
+            <button class="keyboard-key">z</button>
+            <button class="keyboard-key">x</button>
+            <button class="keyboard-key">c</button>
+            <button class="keyboard-key">v</button>
+            <button class="keyboard-key">b</button>
+            <button class="keyboard-key">n</button>
+            <button class="keyboard-key">m</button>
+            <button class="keyboard-key">,</button>
+            <button class="keyboard-key">.</button>
+            <button class="keyboard-key">/</button>
+        </div>
+        <div class="keyboard-row">
+            <button class="keyboard-key space">Space</button>
         </div>
     </div>
 
@@ -930,6 +950,7 @@
         let searchResultsList = [];
         let isShiftOn = false;
         let isKeyboardVisible = false;
+        let currentInputField = null;
         
         // Timer state
         let timerInterval = null;
@@ -1354,35 +1375,52 @@
             keyboardToggle.addEventListener('click', () => {
                 isKeyboardVisible = !isKeyboardVisible;
                 customKeyboard.style.display = isKeyboardVisible ? 'block' : 'none';
+                
+                // Focus on the current input field when keyboard appears
+                if (isKeyboardVisible && currentInputField) {
+                    currentInputField.focus();
+                }
             });
-            
+
+            // Track input focus
+            const inputFields = [mediaSearchInput, cityInput];
+            inputFields.forEach(input => {
+                input.addEventListener('focus', () => {
+                    currentInputField = input;
+                    isKeyboardVisible = true;
+                    customKeyboard.style.display = 'block';
+                });
+            });
+
             // Handle key presses
             keyboardKeys.forEach(key => {
                 key.addEventListener('click', function() {
-                    const keyValue = this.textContent;
-                    const input = document.activeElement;
+                    if (!currentInputField) return;
                     
-                    if (!input) return;
+                    const keyValue = this.textContent.trim();
                     
                     if (this.classList.contains('backspace')) {
                         // Handle backspace
-                        input.value = input.value.slice(0, -1);
+                        currentInputField.value = currentInputField.value.slice(0, -1);
                     } else if (this.classList.contains('enter')) {
                         // Handle enter
-                        if (input === mediaSearchInput) {
+                        if (currentInputField === mediaSearchInput) {
                             searchYouTube();
+                        } else if (currentInputField === cityInput) {
+                            getWeather(cityInput.value.trim());
+                            cityInput.value = '';
                         }
-                        input.blur();
+                        currentInputField.blur();
                     } else if (this.classList.contains('shift')) {
                         // Toggle shift
                         isShiftOn = !isShiftOn;
                         this.style.backgroundColor = isShiftOn ? '#4cc9f0' : '';
                     } else if (this.classList.contains('space')) {
                         // Handle space
-                        input.value += ' ';
+                        currentInputField.value += ' ';
                     } else {
                         // Handle regular keys
-                        input.value += isShiftOn ? keyValue.toUpperCase() : keyValue.toLowerCase();
+                        currentInputField.value += isShiftOn ? keyValue.toUpperCase() : keyValue.toLowerCase();
                         
                         // Turn off shift after one keypress (like mobile keyboards)
                         if (isShiftOn && !this.classList.contains('shift')) {
@@ -1393,14 +1431,8 @@
                     
                     // Trigger input event for any listeners
                     const event = new Event('input', { bubbles: true });
-                    input.dispatchEvent(event);
+                    currentInputField.dispatchEvent(event);
                 });
-            });
-            
-            // Show keyboard when search input is focused
-            mediaSearchInput.addEventListener('focus', () => {
-                isKeyboardVisible = true;
-                customKeyboard.style.display = 'block';
             });
         }
         
