@@ -9,6 +9,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
@@ -18,6 +19,7 @@
             height: 100vh;
             overflow: hidden;
             background: linear-gradient(135deg, #0f172a, #1e293b);
+            touch-action: manipulation;
         }
         
         .dashboard {
@@ -476,6 +478,7 @@
             color: white;
             outline: none;
             border: 1px solid rgba(76, 201, 240, 0.3);
+            font-size: 16px;
         }
 
         #media-search-btn {
@@ -486,6 +489,7 @@
             border: none;
             font-weight: bold;
             cursor: pointer;
+            font-size: 16px;
         }
 
         .youtube-container {
@@ -568,6 +572,79 @@
             -webkit-box-orient: vertical;
         }
 
+        /* Custom On-Screen Keyboard */
+        .custom-keyboard {
+            display: none;
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid rgba(76, 201, 240, 0.3);
+        }
+
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 5px;
+            gap: 5px;
+        }
+
+        .keyboard-key {
+            flex: 1;
+            min-width: 30px;
+            height: 40px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(30, 41, 59, 0.8);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+
+        .keyboard-key:active {
+            background: #4cc9f0;
+            color: #0f172a;
+        }
+
+        .keyboard-key.space {
+            flex: 5;
+        }
+
+        .keyboard-key.enter {
+            flex: 2;
+            background: rgba(76, 201, 240, 0.5);
+        }
+
+        .keyboard-key.backspace {
+            background: rgba(239, 71, 111, 0.5);
+        }
+
+        .keyboard-key.shift {
+            background: rgba(249, 199, 79, 0.5);
+        }
+
+        .keyboard-toggle {
+            position: fixed;
+            bottom: 70px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(76, 201, 240, 0.5);
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 101;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         /* Responsive adjustments for landscape */
         @media (orientation: landscape) {
             .tab-nav {
@@ -584,6 +661,11 @@
             .tab-content {
                 margin-left: 60px;
                 width: calc(100vw - 60px);
+            }
+
+            .keyboard-toggle {
+                bottom: 20px;
+                right: 20px;
             }
         }
     </style>
@@ -702,6 +784,63 @@
             <button id="media-search-btn"><i class="fas fa-search"></i> Search</button>
         </div>
         
+        <!-- Custom On-Screen Keyboard -->
+        <div class="custom-keyboard" id="custom-keyboard">
+            <div class="keyboard-row">
+                <button class="keyboard-key">1</button>
+                <button class="keyboard-key">2</button>
+                <button class="keyboard-key">3</button>
+                <button class="keyboard-key">4</button>
+                <button class="keyboard-key">5</button>
+                <button class="keyboard-key">6</button>
+                <button class="keyboard-key">7</button>
+                <button class="keyboard-key">8</button>
+                <button class="keyboard-key">9</button>
+                <button class="keyboard-key">0</button>
+                <button class="keyboard-key backspace"><i class="fas fa-backspace"></i></button>
+            </div>
+            <div class="keyboard-row">
+                <button class="keyboard-key">q</button>
+                <button class="keyboard-key">w</button>
+                <button class="keyboard-key">e</button>
+                <button class="keyboard-key">r</button>
+                <button class="keyboard-key">t</button>
+                <button class="keyboard-key">y</button>
+                <button class="keyboard-key">u</button>
+                <button class="keyboard-key">i</button>
+                <button class="keyboard-key">o</button>
+                <button class="keyboard-key">p</button>
+            </div>
+            <div class="keyboard-row">
+                <button class="keyboard-key">a</button>
+                <button class="keyboard-key">s</button>
+                <button class="keyboard-key">d</button>
+                <button class="keyboard-key">f</button>
+                <button class="keyboard-key">g</button>
+                <button class="keyboard-key">h</button>
+                <button class="keyboard-key">j</button>
+                <button class="keyboard-key">k</button>
+                <button class="keyboard-key">l</button>
+                <button class="keyboard-key enter">Enter</button>
+            </div>
+            <div class="keyboard-row">
+                <button class="keyboard-key shift">Shift</button>
+                <button class="keyboard-key">z</button>
+                <button class="keyboard-key">x</button>
+                <button class="keyboard-key">c</button>
+                <button class="keyboard-key">v</button>
+                <button class="keyboard-key">b</button>
+                <button class="keyboard-key">n</button>
+                <button class="keyboard-key">m</button>
+                <button class="keyboard-key">,</button>
+                <button class="keyboard-key">.</button>
+                <button class="keyboard-key">/</button>
+            </div>
+            <div class="keyboard-row">
+                <button class="keyboard-key space">Space</button>
+            </div>
+        </div>
+        
         <div class="search-results" id="search-results"></div>
         
         <div class="youtube-container">
@@ -719,6 +858,11 @@
             <button class="media-btn" id="media-volume"><i class="fas fa-volume-up"></i></button>
         </div>
     </div>
+
+    <!-- Keyboard Toggle Button -->
+    <button class="keyboard-toggle" id="keyboard-toggle">
+        <i class="fas fa-keyboard"></i>
+    </button>
 
     <audio id="radio-player"></audio>
 
@@ -769,6 +913,11 @@
         const mediaNextBtn = document.getElementById('media-next');
         const mediaVolumeBtn = document.getElementById('media-volume');
         
+        // Keyboard elements
+        const customKeyboard = document.getElementById('custom-keyboard');
+        const keyboardToggle = document.getElementById('keyboard-toggle');
+        const keyboardKeys = document.querySelectorAll('.keyboard-key');
+        
         // State
         let isPlaying = false;
         let stations = [];
@@ -779,6 +928,8 @@
         let youtubePlayerReady = false;
         let currentVideoId = 'dQw4w9WgXcQ'; // Default video (Rick Astley)
         let searchResultsList = [];
+        let isShiftOn = false;
+        let isKeyboardVisible = false;
         
         // Timer state
         let timerInterval = null;
@@ -789,7 +940,7 @@
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
         
-        // YouTube API Key
+        // YouTube API Key (Replace with your own)
         const YOUTUBE_API_KEY = 'AIzaSyBwphUWyr9U0Eb8gsLN67ojZDA_rOHU3TA';
         
         // Initialize
@@ -815,6 +966,7 @@
             fetchQuote();
             setupEventListeners();
             setupTimer();
+            setupKeyboard();
             loadYouTubePlayer();
         }
         
@@ -1111,16 +1263,33 @@
         async function searchYouTube() {
             const query = mediaSearchInput.value.trim();
             if (!query) return;
+
+            // Show loading state
+            searchResults.innerHTML = '<div class="search-result-item">Searching...</div>';
             
             try {
                 const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}&type=video`);
+                
+                if (!response.ok) {
+                    throw new Error(`API request failed with status ${response.status}`);
+                }
+
                 const data = await response.json();
                 
-                searchResultsList = data.items || [];
+                if (!data.items || data.items.length === 0) {
+                    searchResults.innerHTML = '<div class="search-result-item">No results found</div>';
+                    return;
+                }
+
+                searchResultsList = data.items;
                 displaySearchResults();
             } catch (error) {
                 console.error('YouTube search error:', error);
-                searchResults.innerHTML = '<div class="search-result-item">Error searching YouTube</div>';
+                searchResults.innerHTML = `
+                    <div class="search-result-item">
+                        Error: Could not load results. ${error.message}
+                    </div>
+                `;
             }
         }
         
@@ -1179,6 +1348,62 @@
             }
         }
         
+        // Keyboard Functions
+        function setupKeyboard() {
+            // Toggle keyboard visibility
+            keyboardToggle.addEventListener('click', () => {
+                isKeyboardVisible = !isKeyboardVisible;
+                customKeyboard.style.display = isKeyboardVisible ? 'block' : 'none';
+            });
+            
+            // Handle key presses
+            keyboardKeys.forEach(key => {
+                key.addEventListener('click', function() {
+                    const keyValue = this.textContent;
+                    const input = document.activeElement;
+                    
+                    if (!input) return;
+                    
+                    if (this.classList.contains('backspace')) {
+                        // Handle backspace
+                        input.value = input.value.slice(0, -1);
+                    } else if (this.classList.contains('enter')) {
+                        // Handle enter
+                        if (input === mediaSearchInput) {
+                            searchYouTube();
+                        }
+                        input.blur();
+                    } else if (this.classList.contains('shift')) {
+                        // Toggle shift
+                        isShiftOn = !isShiftOn;
+                        this.style.backgroundColor = isShiftOn ? '#4cc9f0' : '';
+                    } else if (this.classList.contains('space')) {
+                        // Handle space
+                        input.value += ' ';
+                    } else {
+                        // Handle regular keys
+                        input.value += isShiftOn ? keyValue.toUpperCase() : keyValue.toLowerCase();
+                        
+                        // Turn off shift after one keypress (like mobile keyboards)
+                        if (isShiftOn && !this.classList.contains('shift')) {
+                            isShiftOn = false;
+                            document.querySelector('.keyboard-key.shift').style.backgroundColor = '';
+                        }
+                    }
+                    
+                    // Trigger input event for any listeners
+                    const event = new Event('input', { bubbles: true });
+                    input.dispatchEvent(event);
+                });
+            });
+            
+            // Show keyboard when search input is focused
+            mediaSearchInput.addEventListener('focus', () => {
+                isKeyboardVisible = true;
+                customKeyboard.style.display = 'block';
+            });
+        }
+        
         // Event listeners
         function setupEventListeners() {
             // Main click handler for focusing city input
@@ -1202,7 +1427,9 @@
                     mediaPlayBtn,
                     mediaPrevBtn,
                     mediaNextBtn,
-                    mediaVolumeBtn
+                    mediaVolumeBtn,
+                    keyboardToggle,
+                    customKeyboard
                 ];
                 
                 // Check if click is inside settings panel
