@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exciting Theme Collection</title>
+    <style>
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1, h2, h3, h4 {
+            margin-bottom: 15px;
+        }
+        
+        p {
+            margin-bottom: 10px;
+        }
+        
+        button, .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        button:hover, .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Theme Selector */
+        .theme-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .theme-btn {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        /* Demo Content */
+        .demo-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card h3 {
+            border-bottom: 2px solid;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        /* Theme 1: Vibrant Sunset */
+        .theme-sunset {
+            --primary: #FF6B6B;
+            --secondary: #FFA3A3;
+            --accent: #FFD166;
+            --text: #333333;
+            --bg: #FFF5F5;
+            --card-bg: white;
+        }
+        
+        .theme-sunset .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .theme-sunset .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .theme-sunset .btn-accent {
+            background-color: var(--accent);
+            color: var(--text);
+        }
+        
+        .theme-sunset body {
+            background-color: var(--bg);
+            color: var(--text);
+        }
+        
+        .theme-sunset .card {
+            background-color: var(--card-bg);
+        }
+        
+        .theme-sunset h1, .theme-sunset h2, .theme-sunset h3, .theme-sunset h4 {
+            color: var(--primary);
+        }
+        
+        /* Theme 2: Ocean Breeze */
+        .theme-ocean {
+            --primary: #4ECDC4;
+            --secondary: #1A535C;
+            --accent: #FFE66D;
+            --text: #1A535C;
+            --bg: #F7FFF7;
+            --card-bg: white;
+        }
+        
+        .theme-ocean .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .theme-ocean .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .theme-ocean .btn-accent {
+            background-color: var(--accent);
+            color: var(--text);
+        }
+        
+        .theme-ocean body {
+            background-color: var(--bg);
+            color: var(--text);
+        }
+        
+        .theme-ocean .card {
+            background-color: var(--card-bg);
+        }
+        
+        .theme-ocean h1, .theme-ocean h2, .theme-ocean h3, .theme-ocean h4 {
+            color: var(--secondary);
+        }
+        
+        /* Theme 3: Dark Neon */
+        .theme-neon {
+            --primary: #9C27B0;
+            --secondary: #673AB7;
+            --accent: #00BCD4;
+            --text: #E0E0E0;
+            --bg: #121212;
+            --card-bg: #1E1E1E;
+        }
+        
+        .theme-neon .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .theme-neon .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .theme-neon .btn-accent {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .theme-neon body {
+            background-color: var(--bg);
+            color: var(--text);
+        }
+        
+        .theme-neon .card {
+            background-color: var(--card-bg);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .theme-neon h1, .theme-neon h2, .theme-neon h3, .theme-neon h4 {
+            color: var(--primary);
+        }
+        
+        /* Theme 4: Tropical Paradise */
+        .theme-tropical {
+            --primary: #2ECC71;
+            --secondary: #3498DB;
+            --accent: #F1C40F;
+            --text: #2C3E50;
+            --bg: #ECF0F1;
+            --card-bg: white;
+        }
+        
+        .theme-tropical .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .theme-tropical .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .theme-tropical .btn-accent {
+            background-color: var(--accent);
+            color: var(--text);
+        }
+        
+        .theme-tropical body {
+            background-color: var(--bg);
+            color: var(--text);
+        }
+        
+        .theme-tropical .card {
+            background-color: var(--card-bg);
+        }
+        
+        .theme-tropical h1, .theme-tropical h2, .theme-tropical h3, .theme-tropical h4 {
+            color: var(--primary);
+        }
+        
+        /* Theme 5: Royal Elegance */
+        .theme-royal {
+            --primary: #6C5CE7;
+            --secondary: #A29BFE;
+            --accent: #FD79A8;
+            --text: #2D3436;
+            --bg: #F5F6FA;
+            --card-bg: white;
+        }
+        
+        .theme-royal .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .theme-royal .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .theme-royal .btn-accent {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .theme-royal body {
+            background-color: var(--bg);
+            color: var(--text);
+        }
+        
+        .theme-royal .card {
+            background-color: var(--card-bg);
+        }
+        
+        .theme-royal h1, .theme-royal h2, .theme-royal h3, .theme-royal h4 {
+            color: var(--primary);
+        }
+        
+        /* Theme 6: Fiery Passion */
+        .theme-fiery {
+            --primary: #E74C3C;
+            --secondary: #E67E22;
+            --accent: #F1C40F;
+            --text: #2C3E50;
+            --bg: #FDF2E9;
+            --card-bg: white;
+        }
+        
+        .theme-fiery .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .theme-fiery .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .theme-fiery .btn-accent {
+            background-color: var(--accent);
+            color: var(--text);
+        }
+        
+        .theme-fiery body {
+            background-color: var(--bg);
+            color: var(--text);
+        }
+        
+        .theme-fiery .card {
+            background-color: var(--card-bg);
+        }
+        
+        .theme-fiery h1, .theme-fiery h2, .theme-fiery h3, .theme-fiery h4 {
+            color: var(--primary);
+        }
+        
+        /* Theme 7: Cyberpunk */
+        .theme-cyber {
+            --primary: #00F0FF;
+            --secondary: #FF00AA;
+            --accent: #FFEE00;
+            --text: #FFFFFF;
+            --bg: #0A0A0A;
+            --card-bg: #1A1A1A;
+        }
+        
+        .theme-cyber .btn-primary {
+            background-color: var(--primary);
+            color: #0A0A0A;
+            text-shadow: 0 0 5px rgba(0, 240, 255, 0.5);
+        }
+        
+        .theme-cyber .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+            text-shadow: 0 0 5px rgba(255, 0, 170, 0.5);
+        }
+        
+        .theme-cyber .btn-accent {
+            background-color: var(--accent);
+            color: #0A0A0A;
+            text-shadow: 0 0 5px rgba(255, 238, 0, 0.5);
+        }
+        
+        .theme-cyber body {
+            background-color: var(--bg);
+            color: var(--text);
+        }
+        
+        .theme-cyber .card {
+            background-color: var(--card-bg);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+            border: 1px solid rgba(0, 240, 255, 0.1);
+        }
+        
+        .theme-cyber h1, .theme-cyber h2, .theme-cyber h3, .theme-cyber h4 {
+            color: var(--primary);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+        }
+        
+        /* Animation Effects */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* Glow Effects */
+        .glow {
+            box-shadow: 0 0 10px currentColor;
+        }
+        
+        .glow-text {
+            text-shadow: 0 0 5px currentColor;
+        }
+        
+        /* Special Elements */
+        .highlight {
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="theme-sunset">
+    <div class="container">
+        <h1 class="float">Exciting Theme Collection</h1>
+        <p>Click on any theme button below to see it in action!</p>
+        
+        <div class="theme-selector">
+            <button class="theme-btn btn-primary" onclick="changeTheme('theme-sunset')">Sunset</button>
+            <button class="theme-btn btn-secondary" onclick="changeTheme('theme-ocean')">Ocean</button>
+            <button class="theme-btn btn-accent" onclick="changeTheme('theme-neon')">Neon</button>
+            <button class="theme-btn btn-primary" onclick="changeTheme('theme-tropical')">Tropical</button>
+            <button class="theme-btn btn-secondary" onclick="changeTheme('theme-royal')">Royal</button>
+            <button class="theme-btn btn-accent" onclick="changeTheme('theme-fiery')">Fiery</button>
+            <button class="theme-btn btn-primary glow" onclick="changeTheme('theme-cyber')">Cyberpunk</button>
+        </div>
+        
+        <div class="demo-content">
+            <div class="card">
+                <h3>Feature One</h3>
+                <p>This is a demonstration of how content looks in this theme. The colors are carefully selected to create an attractive visual experience.</p>
+                <button class="btn-primary">Learn More</button>
+            </div>
+            
+            <div class="card">
+                <h3>Feature Two</h3>
+                <p>Notice the smooth transitions when hovering over elements. This adds to the modern feel of the theme.</p>
+                <button class="btn-secondary">Get Started</button>
+            </div>
+            
+            <div class="card">
+                <h3>Feature Three</h3>
+                <p>Each theme has primary, secondary and accent colors that work harmoniously together.</p>
+                <button class="btn-accent">Try Now</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Theme Features</h2>
+            <ul>
+                <li><span class="highlight" style="background-color: var(--primary); color: white;">Primary Color</span> - Used for main buttons and headings</li>
+                <li><span class="highlight" style="background-color: var(--secondary); color: white;">Secondary Color</span> - Used for secondary buttons and accents</li>
+                <li><span class="highlight" style="background-color: var(--accent);">Accent Color</span> - Used for highlights and special elements</li>
+                <li>Responsive design that works on all devices</li>
+                <li>Smooth animations and transitions</li>
+                <li>Easy to customize with CSS variables</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        function changeTheme(themeName) {
+            document.body.className = themeName;
+            
+            // Add pulse animation to all cards temporarily
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.classList.add('pulse');
+                setTimeout(() => {
+                    card.classList.remove('pulse');
+                }, 2000);
+            });
+        }
+        
+        // Add floating animation to random cards
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.card');
+            const randomCard = cards[Math.floor(Math.random() * cards.length)];
+            randomCard.classList.add('float');
+        });
+    </script>
+</body>
+</html>
