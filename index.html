@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=800, height=480, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Smart Dashboard</title>
     <style>
         * {
@@ -16,8 +16,11 @@
         body {
             font-family: 'Arial', sans-serif;
             color: #e6e6e6;
-            width: 100vw;
-            height: 100vh;
+            width: 800px;
+            height: 480px;
+            margin: 0;
+            padding: 0;
+            position: fixed;
             overflow: hidden;
             background: linear-gradient(135deg, #0f172a, #1e293b);
             touch-action: manipulation;
@@ -143,9 +146,10 @@
         .dashboard {
             display: flex;
             flex-direction: column;
-            height: 100%;
-            width: 100%;
+            width: 800px;
+            height: 480px;
             max-width: 800px;
+            max-height: 480px;
             margin: 0 auto;
             padding: 5px;
             overflow: hidden;
