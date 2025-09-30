@@ -442,7 +442,7 @@
             margin-bottom: 5px;
         }
         #current-station-name {
-            font-size: 1.2rem;
+            font-size: 0.9rem;
             font-weight: 600;
             color: var(--primary-text);
         }
@@ -496,7 +496,7 @@
         .radio-dropdown {
             position: relative;
             width: 100%;
-            margin-top: 10px;
+            margin-top: 6px;
         }
         .radio-dropdown-btn {
             width: 100%;
@@ -513,7 +513,7 @@
         }
         .radio-dropdown-options {
             position: absolute;
-            bottom: 100%;
+            top: 100%;
             left: 0;
             width: 100%;
             background-color: var(--card-bg);
@@ -521,7 +521,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             max-height: 120px;
             overflow-y: auto;
-            margin-bottom: 5px;
+            margin-top: 5px;
             z-index: 50;
             display: none;
         }
@@ -1136,11 +1136,11 @@
                                 <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5" class="volume-slider">
                             </div>
                             <div class="radio-dropdown">
-                                <button id="language-select-btn" class="radio-dropdown-btn">Select Language <i class="fas fa-chevron-up"></i></button>
+                                <button id="language-select-btn" class="radio-dropdown-btn">Select Language <i class="fas fa-chevron-down"></i></button>
                                 <div id="language-select-options" class="radio-dropdown-options"></div>
                             </div>
                             <div class="radio-dropdown">
-                                <button id="station-select-btn" class="radio-dropdown-btn">Select Station <i class="fas fa-chevron-up"></i></button>
+                                <button id="station-select-btn" class="radio-dropdown-btn">Select Station <i class="fas fa-chevron-down"></i></button>
                                 <div id="station-select-options" class="radio-dropdown-options"></div>
                             </div>
                         </div>
@@ -1552,7 +1552,7 @@
                 option.addEventListener('click', () => selectLanguage(languageName));
                 languageSelectOptions.appendChild(option);
             });
-            languageSelectBtn.innerHTML = `${selectedLanguage} <i class="fas fa-chevron-up"></i>`;
+            languageSelectBtn.innerHTML = `${selectedLanguage} <i class="fas fa-chevron-down"></i>`;
         }
 
         async function loadStationsForLanguage(languageName) {
@@ -1591,7 +1591,7 @@
         function selectLanguage(languageName) {
             selectedLanguage = languageName;
             localStorage.setItem('selectedLanguage', selectedLanguage);
-            languageSelectBtn.innerHTML = `${selectedLanguage} <i class="fas fa-chevron-up"></i>`;
+            languageSelectBtn.innerHTML = `${selectedLanguage} <i class="fas fa-chevron-down"></i>`;
             languageSelectOptions.style.display = 'none';
             loadStationsForLanguage(selectedLanguage);
             showNotification(`Selected language: ${selectedLanguage}`, 'info');
@@ -2370,21 +2370,21 @@
                 e.stopPropagation();
                 const isOptionsVisible = stationSelectOptions.style.display === 'block';
                 stationSelectOptions.style.display = isOptionsVisible ? 'none' : 'block';
-                stationSelectBtn.querySelector('i').className = isOptionsVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+                stationSelectBtn.querySelector('i').className = isOptionsVisible ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
             });
             // Language dropdown toggle - NEW
             languageSelectBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const isOptionsVisible = languageSelectOptions.style.display === 'block';
                 languageSelectOptions.style.display = isOptionsVisible ? 'none' : 'block';
-                languageSelectBtn.querySelector('i').className = isOptionsVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+                languageSelectBtn.querySelector('i').className = isOptionsVisible ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
             });
             document.addEventListener('click', (e) => {
                 if (!e.target.closest('.radio-dropdown')) {
                     stationSelectOptions.style.display = 'none';
                     languageSelectOptions.style.display = 'none';
-                    stationSelectBtn.querySelector('i').className = 'fas fa-chevron-up';
-                    languageSelectBtn.querySelector('i').className = 'fas fa-chevron-up';
+                    stationSelectBtn.querySelector('i').className = 'fas fa-chevron-down';
+                    languageSelectBtn.querySelector('i').className = 'fas fa-chevron-down';
                 }
             });
             youtubeSearchBtn.addEventListener('click', searchYouTube);
