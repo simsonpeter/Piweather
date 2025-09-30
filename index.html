@@ -442,7 +442,7 @@
             margin-bottom: 5px;
         }
         #current-station-name {
-            font-size: 1.2rem;
+            font-size: 0.9rem;
             font-weight: 600;
             color: var(--primary-text);
         }
@@ -496,7 +496,7 @@
         .radio-dropdown {
             position: relative;
             width: 100%;
-            margin-top: 10px;
+            margin-top: 6px;
         }
         .radio-dropdown-btn {
             width: 100%;
@@ -513,7 +513,7 @@
         }
         .radio-dropdown-options {
             position: absolute;
-            bottom: 100%;
+            top: 100%;
             left: 0;
             width: 100%;
             background-color: var(--card-bg);
@@ -521,7 +521,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             max-height: 120px;
             overflow-y: auto;
-            margin-bottom: 5px;
+            margin-top: 5px;
             z-index: 50;
             display: none;
         }
@@ -943,6 +943,25 @@
             font-size: 2rem;
             font-weight: 300;
         }
+        /* Screensaver Now Playing */
+        .screensaver-now-playing {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .screensaver-now-playing img {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 2px solid #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .screensaver-now-playing-text {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
         /* NEWS TICKER STYLES - MODIFIED FOR SEAMLESS LOOP */
         .news-ticker-container {
             width: 100%;
@@ -1136,7 +1155,11 @@
                                 <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5" class="volume-slider">
                             </div>
                             <div class="radio-dropdown">
-                                <button id="station-select-btn" class="radio-dropdown-btn">Select Station <i class="fas fa-chevron-up"></i></button>
+                                <button id="language-select-btn" class="radio-dropdown-btn">Select Language <i class="fas fa-chevron-down"></i></button>
+                                <div id="language-select-options" class="radio-dropdown-options"></div>
+                            </div>
+                            <div class="radio-dropdown">
+                                <button id="station-select-btn" class="radio-dropdown-btn">Select Station <i class="fas fa-chevron-down"></i></button>
                                 <div id="station-select-options" class="radio-dropdown-options"></div>
                             </div>
                         </div>
@@ -1247,6 +1270,10 @@
             <h1 id="screensaver-temperature">--°</h1>
         </div>
         <h3 id="screensaver-city"></h3>
+        <div id="screensaver-now-playing" class="screensaver-now-playing" style="display: none;">
+            <img id="screensaver-station-icon" src="" alt="Station icon" style="display: none;">
+            <div id="screensaver-station-text" class="screensaver-now-playing-text">Now Playing</div>
+        </div>
     </div>
     <script>
         // DOM Elements
@@ -1329,8 +1356,14 @@
         const screensaverClearBtn = document.getElementById('screensaver-clear-btn');
         const screensaverDisableBtn = document.getElementById('screensaver-disable-btn');
         const screensaverDisplay = document.getElementById('screensaver-display');
+        const screensaverNowPlaying = document.getElementById('screensaver-now-playing');
+        const screensaverStationIcon = document.getElementById('screensaver-station-icon');
+        const screensaverStationText = document.getElementById('screensaver-station-text');
         // NEWS TICKER DOM ELEMENT - NEW
         const newsTicker = document.getElementById('news-ticker');
+        // Language selector DOM elements - NEW
+        const languageSelectBtn = document.getElementById('language-select-btn');
+        const languageSelectOptions = document.getElementById('language-select-options');
         // State
         let isPlaying = false;
         let currentStationIndex = -1;
@@ -1357,7 +1390,120 @@
         const YOUTUBE_API_KEY = 'AIzaSyBwphUWyr9U0Eb8gsLN67ojZDA_rOHU3TA'; // WARNING: This is a public key, do not use in production without a backend proxy.
         // NEWS API KEY - NEW
         const NEWS_API_KEY = '7446c8e28d503d82c84577c80c13c8fc';
-        const RADIO_STATIONS_URL = 'https://raw.githubusercontent.com/simsonpeter/Tcradios/main/stations.json';
+        // Language station file map - NEW
+        const LANGUAGE_FILES = {
+            'Tamil': 'https://raw.githubusercontent.com/simsonpeter/Tcradios/refs/heads/main/languages/tamil.json',
+            'Dutch': 'https://raw.githubusercontent.com/simsonpeter/Tcradios/refs/heads/main/languages/dutch.json',
+            'English': 'https://raw.githubusercontent.com/simsonpeter/Tcradios/refs/heads/main/languages/english.json',
+            'Hindi': 'https://raw.githubusercontent.com/simsonpeter/Tcradios/refs/heads/main/languages/hindi.json',
+            'Malayalam': 'https://raw.githubusercontent.com/simsonpeter/Tcradios/refs/heads/main/languages/malayalam.json',
+            'Sinhala': 'https://raw.githubusercontent.com/simsonpeter/Tcradios/refs/heads/main/languages/sinhala.json'
+        };
+        let selectedLanguage = localStorage.getItem('selectedLanguage') || 'Tamil';
+        let languageData = null;
+        const LANGUAGE_CODE_MAP = { 'Tamil': 'ta', 'English': 'en', 'Dutch': 'nl', 'Hindi': 'hi', 'Malayalam': 'ml', 'Sinhala': 'si' };
+
+        function t(key, fallback) {
+            try {
+                if (languageData && languageData.ui && Object.prototype.hasOwnProperty.call(languageData.ui, key)) {
+                    const value = languageData.ui[key];
+                    if (typeof value === 'string' && value.trim().length > 0) return value;
+                }
+            } catch (_) {}
+            return fallback !== undefined ? fallback : key;
+        }
+
+        async function loadLanguage(languageName) {
+            const url = LANGUAGE_FILES[languageName];
+            if (!url) return;
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`Failed to load language file: ${languageName}`);
+            languageData = await res.json();
+            selectedLanguage = languageName;
+            localStorage.setItem('selectedLanguage', selectedLanguage);
+            applyLanguage();
+            rebuildStationDropdown();
+        }
+
+        function applyLanguage() {
+            if (languageSelectBtn) languageSelectBtn.innerHTML = `${selectedLanguage} <i class="fas fa-chevron-down"></i>`;
+            const stationLabel = t('selectStation', 'Select Station');
+            if (stationSelectBtn && (currentStationIndex < 0 || !radioStations[currentStationIndex])) {
+                stationSelectBtn.innerHTML = `${stationLabel} <i class="fas fa-chevron-down"></i>`;
+            }
+            if (currentStationName && (currentStationIndex < 0 || !radioStations[currentStationIndex])) {
+                currentStationName.textContent = t('selectAStation', 'Select a Station');
+            }
+            const weatherHeader = document.querySelector('#weather-section .widget-header h2');
+            if (weatherHeader) weatherHeader.textContent = t('weather', weatherHeader.textContent);
+            const radioHeader = document.querySelector('.radio-widget .widget-header h2');
+            if (radioHeader) radioHeader.textContent = t('tcRadios', radioHeader.textContent);
+            const homeTabBtn = document.querySelector('.tab-button[data-tab="home"]');
+            if (homeTabBtn) homeTabBtn.innerHTML = `<i class="fas fa-home"></i> ${t('home', 'Home')}`;
+            const ytTabBtn = document.querySelector('.tab-button[data-tab="youtube"]');
+            if (ytTabBtn) ytTabBtn.innerHTML = `<i class="fab fa-youtube"></i> ${t('youtube', 'YouTube')}`;
+            const calTabBtn = document.querySelector('.tab-button[data-tab="calendar"]');
+            if (calTabBtn) calTabBtn.innerHTML = `<i class="fas fa-calendar-alt"></i> ${t('calendar', 'Calendar')}`;
+        }
+
+        function populateLanguageDropdown() {
+            if (!languageSelectOptions) return;
+            languageSelectOptions.innerHTML = '';
+            Object.keys(LANGUAGE_FILES).forEach(lang => {
+                const option = document.createElement('div');
+                option.className = 'radio-dropdown-option';
+                option.textContent = lang;
+                option.dataset.lang = lang;
+                option.addEventListener('click', async () => {
+                    languageSelectOptions.style.display = 'none';
+                    await loadLanguage(lang);
+                    showNotification(`Language set to ${lang}`, 'info');
+                });
+                languageSelectOptions.appendChild(option);
+            });
+            if (languageSelectBtn) {
+                languageSelectBtn.innerHTML = `${selectedLanguage} <i class="fas fa-chevron-down"></i>`;
+            }
+        }
+
+        function getStationDisplayName(station) {
+            if (!station) return '';
+            const selectedLang = selectedLanguage;
+            const code = LANGUAGE_CODE_MAP[selectedLang] || selectedLang?.slice(0,2).toLowerCase();
+            const candidates = [];
+            if (station.nameTranslations && typeof station.nameTranslations === 'object') {
+                if (station.nameTranslations[selectedLang]) candidates.push(station.nameTranslations[selectedLang]);
+                if (station.nameTranslations[code]) candidates.push(station.nameTranslations[code]);
+            }
+            if (station.names && typeof station.names === 'object') {
+                if (station.names[selectedLang]) candidates.push(station.names[selectedLang]);
+                if (station.names[code]) candidates.push(station.names[code]);
+            }
+            if (code && station[`name_${code}`]) candidates.push(station[`name_${code}`]);
+            if (code && station[code]) candidates.push(station[code]);
+            if (station[selectedLang]) candidates.push(station[selectedLang]);
+            const localized = candidates.find(v => typeof v === 'string' && v.trim().length > 0);
+            return localized || station.name;
+        }
+
+        function rebuildStationDropdown() {
+            if (!Array.isArray(radioStations)) return;
+            if (!stationSelectOptions) return;
+            stationSelectOptions.innerHTML = '';
+            radioStations.forEach((station, index) => {
+                const option = document.createElement('div');
+                option.className = 'radio-dropdown-option';
+                option.textContent = getStationDisplayName(station);
+                option.dataset.index = index;
+                option.addEventListener('click', () => selectStation(index));
+                stationSelectOptions.appendChild(option);
+            });
+            if (currentStationIndex >= 0 && radioStations[currentStationIndex]) {
+                const name = getStationDisplayName(radioStations[currentStationIndex]);
+                currentStationName.textContent = name;
+                stationSelectBtn.innerHTML = `${name} <i class="fas fa-chevron-up"></i>`;
+            }
+        }
         let touchStartY = 0;
         let isSwiping = false;
         // Calendar State
@@ -1373,9 +1519,15 @@
         let isShift = false;
         let isNumbers = false;
         // Initialize function
-        function init() {
+        async function init() {
             updateClock();
-            loadRadioStations();
+            // Load language first so UI and stations render in the right language
+            try {
+                await loadLanguage(selectedLanguage);
+            } catch (e) {
+                console.error('Failed to load language, falling back to English/Tamil:', e);
+            }
+            await loadStationsForLanguage(selectedLanguage);
             getWeather(currentCity);
             setupEventListeners();
             loadYouTubeAPI();
@@ -1395,6 +1547,8 @@
             resetScreensaverTimer();
             // Load screensaver settings from localStorage
             loadScreensaverSettings();
+            // Build language dropdown after DOM is ready and language is set
+            populateLanguageDropdown();
             // Load news ticker - MODIFIED
             fetchNews();
         }
@@ -1527,38 +1681,49 @@
             }
         }
         // Radio functions
-        async function loadRadioStations() {
+        
+
+        async function loadStationsForLanguage(languageName) {
             try {
-                const response = await fetch(RADIO_STATIONS_URL);
+                const url = LANGUAGE_FILES[languageName];
+                if (!url) {
+                    throw new Error('Language file URL not found');
+                }
+                const response = await fetch(url);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 radioStations = await response.json();
-                // Populate station dropdown
-                stationSelectOptions.innerHTML = '';
-                radioStations.forEach((station, index) => {
-                    const option = document.createElement('div');
-                    option.className = 'radio-dropdown-option';
-                    option.textContent = station.name;
-                    option.dataset.index = index;
-                    option.addEventListener('click', () => selectStation(index));
-                    stationSelectOptions.appendChild(option);
-                });
+                // Populate station dropdown (localized)
+                rebuildStationDropdown();
                 // Select first station by default
                 if (radioStations.length > 0) {
                     selectStation(0);
+                } else {
+                    currentStationName.textContent = 'No stations available';
+                    stationIcon.style.display = 'none';
                 }
             } catch (error) {
-                console.error('Error loading radio stations:', error);
-                showNotification('Failed to load radio stations', 'error');
+                console.error('Error loading stations for language:', error);
+                showNotification('Failed to load stations for selected language', 'error');
             }
+        }
+
+        function selectLanguage(languageName) {
+            selectedLanguage = languageName;
+            localStorage.setItem('selectedLanguage', selectedLanguage);
+            languageSelectBtn.innerHTML = `${selectedLanguage} <i class="fas fa-chevron-down"></i>`;
+            languageSelectOptions.style.display = 'none';
+            loadStationsForLanguage(selectedLanguage);
+            showNotification(`Selected language: ${selectedLanguage}`, 'info');
         }
         function selectStation(index) {
             currentStationIndex = index;
             const station = radioStations[currentStationIndex];
             if (!station) return;
-            currentStationName.textContent = station.name;
-            stationSelectBtn.innerHTML = `${station.name} <i class="fas fa-chevron-up"></i>`;
+            const displayName = getStationDisplayName(station);
+            currentStationName.textContent = displayName;
+            stationSelectBtn.innerHTML = `${displayName} <i class="fas fa-chevron-up"></i>`;
             // Correctly fetch and display the icon from the JSON
             if (station.icon) {
                 stationIcon.src = station.icon;
@@ -1570,7 +1735,10 @@
             if (isPlaying) {
                 playStation();
             }
-            showNotification(`Selected station: ${station.name}`, 'info');
+            showNotification(`Selected station: ${displayName}`, 'info');
+            if (screensaverEl.style.display === 'flex') {
+                updateScreensaverContent();
+            }
         }
         function playStation() {
             const station = radioStations[currentStationIndex];
@@ -1580,7 +1748,11 @@
             .then(() => {
                 isPlaying = true;
                 playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                showNotification(`Playing: ${station.name}`, 'success');
+                showNotification(`Playing: ${getStationDisplayName(station)}`, 'success');
+                // Ensure screensaver reflects latest now playing
+                if (screensaverEl.style.display === 'flex') {
+                    updateScreensaverContent();
+                }
             })
             .catch(error => {
                 console.error('Playback failed:', error);
@@ -1591,6 +1763,9 @@
             radioPlayer.pause();
             isPlaying = false;
             playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            if (screensaverEl.style.display === 'flex') {
+                updateScreensaverContent();
+            }
         }
         function togglePlayback() {
             if (isPlaying) {
@@ -1807,6 +1982,20 @@
                 screensaverWeatherIcon.style.display = 'none';
                 screensaverTemperature.textContent = '--°';
                 screensaverCity.textContent = '';
+            }
+            // Update Now Playing
+            if (isPlaying && currentStationIndex >= 0 && radioStations[currentStationIndex]) {
+                const station = radioStations[currentStationIndex];
+                screensaverNowPlaying.style.display = 'flex';
+                screensaverStationText.textContent = `Now Playing: ${station.name}`;
+                if (station.icon) {
+                    screensaverStationIcon.src = station.icon;
+                    screensaverStationIcon.style.display = 'block';
+                } else {
+                    screensaverStationIcon.style.display = 'none';
+                }
+            } else {
+                screensaverNowPlaying.style.display = 'none';
             }
         }
         function resetScreensaverTimer() {
@@ -2327,12 +2516,34 @@
                 e.stopPropagation();
                 const isOptionsVisible = stationSelectOptions.style.display === 'block';
                 stationSelectOptions.style.display = isOptionsVisible ? 'none' : 'block';
-                stationSelectBtn.querySelector('i').className = isOptionsVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+                stationSelectBtn.querySelector('i').className = isOptionsVisible ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+            });
+            // Language dropdown toggle - NEW
+            languageSelectBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOptionsVisible = languageSelectOptions.style.display === 'block';
+                languageSelectOptions.style.display = isOptionsVisible ? 'none' : 'block';
+                languageSelectBtn.querySelector('i').className = isOptionsVisible ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
             });
             document.addEventListener('click', (e) => {
                 if (!e.target.closest('.radio-dropdown')) {
                     stationSelectOptions.style.display = 'none';
-                    stationSelectBtn.querySelector('i').className = 'fas fa-chevron-up';
+                    languageSelectOptions.style.display = 'none';
+                    stationSelectBtn.querySelector('i').className = 'fas fa-chevron-down';
+                    languageSelectBtn.querySelector('i').className = 'fas fa-chevron-down';
+                }
+            });
+            // Language dropdown toggle
+            languageSelectBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOptionsVisible = languageSelectOptions.style.display === 'block';
+                languageSelectOptions.style.display = isOptionsVisible ? 'none' : 'block';
+                languageSelectBtn.querySelector('i').className = isOptionsVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+            });
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.radio-dropdown')) {
+                    languageSelectOptions.style.display = 'none';
+                    languageSelectBtn.querySelector('i').className = 'fas fa-chevron-up';
                 }
             });
             youtubeSearchBtn.addEventListener('click', searchYouTube);
