@@ -1516,7 +1516,7 @@
                 tempMaxEl.textContent = Math.round(data.main.temp_max);
                 tempMinEl.textContent = Math.round(data.main.temp_min);
                 pressureEl.textContent = data.main.pressure;
-                weatherIcon.src = `http://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`;
+                weatherIcon.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`;
                 weatherIcon.style.display = 'block';
                 showNotification(`Weather updated for ${data.name}`, 'success');
             } catch (error) {
@@ -1799,7 +1799,7 @@
             const seconds = now.getSeconds().toString().padStart(2, '0');
             screensaverClockEl.textContent = `${hours}:${minutes}:${seconds}`;
             if (weatherData) {
-                screensaverWeatherIcon.src = `http://openweathermap.org/img/wn/${weatherData.weather[0].icon}@4x.png`;
+                screensaverWeatherIcon.src = `https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@4x.png`;
                 screensaverWeatherIcon.style.display = 'block';
                 screensaverTemperature.textContent = `${Math.round(weatherData.main.temp)}°`;
                 screensaverCity.textContent = weatherData.name;
