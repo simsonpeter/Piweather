@@ -1388,4 +1388,154 @@
         let selectedCalendarDay = null;
         let events = JSON.parse(localStorage.getItem('calendarEvents')) || {};
         let specialDays = { '2025-08-15': 'Assumption Day', '2025-12-25': 'Christmas', '2026-01-01': 'New Year' };
-        const days = ['Sunday', 'M
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+        // --- Language Dropdown Logic ---
+        const savedLanguage = localStorage.getItem('selectedLanguage');
+        let currentLanguage = savedLanguage && LANGUAGE_FILES[savedLanguage] ? savedLanguage : Object.keys(LANGUAGE_FILES)[0];
+
+        function populateLanguageDropdown() {
+            languageSelectOptions.innerHTML = '';
+            Object.keys(LANGUAGE_FILES).forEach((languageName) => {
+                const option = document.createElement('div');
+                option.className = 'radio-dropdown-option';
+                option.textContent = languageName;
+                option.dataset.language = languageName;
+                option.addEventListener('click', () => {
+                    selectLanguage(languageName);
+                });
+                languageSelectOptions.appendChild(option);
+            });
+            languageSelectBtn.innerHTML = `${currentLanguage} <i class="fas fa-chevron-up"></i>`;
+        }
+
+        function toggleLanguageDropdown() {
+            const isOptionsVisible = languageSelectOptions.style.display === 'block';
+            languageSelectOptions.style.display = isOptionsVisible ? 'none' : 'block';
+            languageSelectBtn.querySelector('i').className = isOptionsVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+        }
+
+        languageSelectBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleLanguageDropdown();
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.radio-dropdown')) {
+                languageSelectOptions.style.display = 'none';
+                const icon = languageSelectBtn.querySelector('i');
+                if (icon) icon.className = 'fas fa-chevron-up';
+            }
+        });
+
+        async function selectLanguage(languageName) {
+            currentLanguage = languageName;
+            localStorage.setItem('selectedLanguage', currentLanguage);
+            languageSelectBtn.innerHTML = `${currentLanguage} <i class="fas fa-chevron-up"></i>`;
+            languageSelectOptions.style.display = 'none';
+            await loadStationsForLanguage(currentLanguage);
+        }
+
+        async function loadStationsForLanguage(languageName) {
+            const url = LANGUAGE_FILES[languageName];
+            if (!url) return;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const stations = await response.json();
+                radioStations = stations;
+                populateStationDropdown();
+                if (radioStations.length > 0) {
+                    selectStation(0);
+                }
+            } catch (err) {
+                console.error('Failed to load stations for language', languageName, err);
+            }
+        }
+
+        function populateStationDropdown() {
+            stationSelectOptions.innerHTML = '';
+            radioStations.forEach((station, index) => {
+                const option = document.createElement('div');
+                option.className = 'radio-dropdown-option';
+                option.textContent = station.name || `Station ${index + 1}`;
+                option.dataset.index = index;
+                option.addEventListener('click', () => selectStation(index));
+                stationSelectOptions.appendChild(option);
+            });
+        }
+
+        function selectStation(index) {
+            currentStationIndex = index;
+            const station = radioStations[currentStationIndex];
+            if (!station) return;
+            currentStationName.textContent = station.name || 'Unknown Station';
+            stationSelectBtn.innerHTML = `${station.name || 'Unknown Station'} <i class="fas fa-chevron-up"></i>`;
+            if (station.icon) {
+                stationIcon.src = station.icon;
+                stationIcon.style.display = 'block';
+            } else {
+                stationIcon.style.display = 'none';
+            }
+            stationSelectOptions.style.display = 'none';
+            if (isPlaying) {
+                playStation();
+            }
+        }
+
+        function playStation() {
+            const station = radioStations[currentStationIndex];
+            if (!station) return;
+            radioPlayer.src = station.url;
+            radioPlayer.play().catch(() => {});
+            isPlaying = true;
+            playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+        }
+
+        function pauseStation() {
+            radioPlayer.pause();
+            isPlaying = false;
+            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+        }
+
+        playBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                pauseStation();
+            } else {
+                playStation();
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (radioStations.length === 0) return;
+            currentStationIndex = (currentStationIndex - 1 + radioStations.length) % radioStations.length;
+            selectStation(currentStationIndex);
+            playStation();
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (radioStations.length === 0) return;
+            currentStationIndex = (currentStationIndex + 1) % radioStations.length;
+            selectStation(currentStationIndex);
+            playStation();
+        });
+
+        volumeSlider.addEventListener('input', () => {
+            radioPlayer.volume = parseFloat(volumeSlider.value || '0.5');
+        });
+
+        volumeBtn.addEventListener('click', () => {
+            radioPlayer.muted = !radioPlayer.muted;
+        });
+
+        stationSelectBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOptionsVisible = stationSelectOptions.style.display === 'block';
+            stationSelectOptions.style.display = isOptionsVisible ? 'none' : 'block';
+            stationSelectBtn.querySelector('i').className = isOptionsVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+        });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            populateLanguageDropdown();
+            await loadStationsForLanguage(currentLanguage);
+        });
