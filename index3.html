@@ -946,6 +946,25 @@
             font-size: 2rem;
             font-weight: 300;
         }
+        /* Screensaver Now Playing */
+        .screensaver-now-playing {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .screensaver-now-playing img {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 2px solid #fff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .screensaver-now-playing-text {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
         /* NEWS TICKER STYLES - MODIFIED FOR SEAMLESS LOOP */
         .news-ticker-container {
             width: 100%;
@@ -1255,6 +1274,10 @@
             <h1 id="screensaver-temperature">--°</h1>
         </div>
         <h3 id="screensaver-city"></h3>
+        <div id="screensaver-now-playing" class="screensaver-now-playing" style="display: none;">
+            <img id="screensaver-station-icon" src="" alt="Station icon" style="display: none;">
+            <div id="screensaver-station-text" class="screensaver-now-playing-text">Now Playing</div>
+        </div>
     </div>
     <script>
         // DOM Elements
@@ -1337,6 +1360,9 @@
         const screensaverClearBtn = document.getElementById('screensaver-clear-btn');
         const screensaverDisableBtn = document.getElementById('screensaver-disable-btn');
         const screensaverDisplay = document.getElementById('screensaver-display');
+        const screensaverNowPlaying = document.getElementById('screensaver-now-playing');
+        const screensaverStationIcon = document.getElementById('screensaver-station-icon');
+        const screensaverStationText = document.getElementById('screensaver-station-text');
         // NEWS TICKER DOM ELEMENT - NEW
         const newsTicker = document.getElementById('news-ticker');
 
