@@ -2514,36 +2514,32 @@
             });
             stationSelectBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const isOptionsVisible = stationSelectOptions.style.display === 'block';
-                stationSelectOptions.style.display = isOptionsVisible ? 'none' : 'block';
-                stationSelectBtn.querySelector('i').className = isOptionsVisible ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+                const stationOpen = stationSelectOptions.style.display === 'block';
+                // Toggle station options
+                stationSelectOptions.style.display = stationOpen ? 'none' : 'block';
+                stationSelectBtn.querySelector('i').className = stationOpen ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+                // Ensure language options are closed
+                languageSelectOptions.style.display = 'none';
+                languageSelectBtn.querySelector('i').className = 'fas fa-chevron-down';
             });
-            // Language dropdown toggle - NEW
+            // Language dropdown toggle
             languageSelectBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const isOptionsVisible = languageSelectOptions.style.display === 'block';
-                languageSelectOptions.style.display = isOptionsVisible ? 'none' : 'block';
-                languageSelectBtn.querySelector('i').className = isOptionsVisible ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+                const langOpen = languageSelectOptions.style.display === 'block';
+                // Toggle language options
+                languageSelectOptions.style.display = langOpen ? 'none' : 'block';
+                languageSelectBtn.querySelector('i').className = langOpen ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+                // Ensure station options are closed
+                stationSelectOptions.style.display = 'none';
+                stationSelectBtn.querySelector('i').className = 'fas fa-chevron-down';
             });
+            // Click outside closes both dropdowns
             document.addEventListener('click', (e) => {
                 if (!e.target.closest('.radio-dropdown')) {
                     stationSelectOptions.style.display = 'none';
                     languageSelectOptions.style.display = 'none';
                     stationSelectBtn.querySelector('i').className = 'fas fa-chevron-down';
                     languageSelectBtn.querySelector('i').className = 'fas fa-chevron-down';
-                }
-            });
-            // Language dropdown toggle
-            languageSelectBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const isOptionsVisible = languageSelectOptions.style.display === 'block';
-                languageSelectOptions.style.display = isOptionsVisible ? 'none' : 'block';
-                languageSelectBtn.querySelector('i').className = isOptionsVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
-            });
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('.radio-dropdown')) {
-                    languageSelectOptions.style.display = 'none';
-                    languageSelectBtn.querySelector('i').className = 'fas fa-chevron-up';
                 }
             });
             youtubeSearchBtn.addEventListener('click', searchYouTube);
