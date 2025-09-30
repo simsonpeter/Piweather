@@ -522,7 +522,7 @@
             max-height: 120px;
             overflow-y: auto;
             margin-top: 5px;
-            z-index: 50;
+            z-index: 9999;
             display: none;
         }
         .radio-dropdown-options::-webkit-scrollbar {
@@ -2526,6 +2526,10 @@
             languageSelectBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const langOpen = languageSelectOptions.style.display === 'block';
+                if (!langOpen) {
+                    // Rebuild options defensively before opening
+                    populateLanguageDropdown();
+                }
                 // Toggle language options
                 languageSelectOptions.style.display = langOpen ? 'none' : 'block';
                 languageSelectBtn.querySelector('i').className = langOpen ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
