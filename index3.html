@@ -1421,7 +1421,12 @@
         let currentLanguage = savedLanguage && LANGUAGE_FILES[savedLanguage] ? savedLanguage : Object.keys(LANGUAGE_FILES)[0];
 
         function populateLanguageDropdown() {
+            if (!languageSelectOptions) {
+                console.error('Language select options element not found');
+                return;
+            }
             languageSelectOptions.innerHTML = '';
+            console.log('Populating language dropdown with', Object.keys(LANGUAGE_FILES).length, 'options');
             Object.keys(LANGUAGE_FILES).forEach((languageName) => {
                 const option = document.createElement('div');
                 option.className = 'radio-dropdown-option';
@@ -1431,12 +1436,19 @@
                     selectLanguage(languageName);
                 });
                 languageSelectOptions.appendChild(option);
+                console.log('Added language option:', languageName);
             });
+            // Make dropdown options visible by default for testing
+            languageSelectOptions.style.display = 'block';
+            languageSelectOptions.style.opacity = '0.8'; // Make it semi-transparent to test visibility
+            
+            console.log('Language dropdown children count:', languageSelectOptions.children.length);
             languageSelectBtn.innerHTML = `${currentLanguage} <i class="fas fa-chevron-up"></i>`;
         }
 
         function toggleLanguageDropdown() {
             const isOptionsVisible = languageSelectOptions.style.display === 'block';
+            console.log('Toggle language dropdown:', isOptionsVisible ? 'closing' : 'opening');
             languageSelectOptions.style.display = isOptionsVisible ? 'none' : 'block';
             languageSelectBtn.querySelector('i').className = isOptionsVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
         }
@@ -1480,7 +1492,12 @@
         }
 
         function populateStationDropdown() {
+            if (!stationSelectOptions) {
+                console.error('Station select options element not found');
+                return;
+            }
             stationSelectOptions.innerHTML = '';
+            console.log('Populating station dropdown with', radioStations.length, 'stations');
             radioStations.forEach((station, index) => {
                 const option = document.createElement('div');
                 option.className = 'radio-dropdown-option';
@@ -1488,7 +1505,13 @@
                 option.dataset.index = index;
                 option.addEventListener('click', () => selectStation(index));
                 stationSelectOptions.appendChild(option);
+                console.log('Added station option:', station.name);
             });
+            // Make dropdown options visible by default for testing
+            stationSelectOptions.style.display = 'block';
+            stationSelectOptions.style.opacity = '0.8'; // Make it semi-transparent to test visibility
+            
+            console.log('Station dropdown children count:', stationSelectOptions.children.length);
         }
 
         function selectStation(index) {
@@ -1557,11 +1580,20 @@
         stationSelectBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             const isOptionsVisible = stationSelectOptions.style.display === 'block';
+            console.log('Toggle station dropdown:', isOptionsVisible ? 'closing' : 'opening');
             stationSelectOptions.style.display = isOptionsVisible ? 'none' : 'block';
             stationSelectBtn.querySelector('i').className = isOptionsVisible ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
         });
 
         document.addEventListener('DOMContentLoaded', async () => {
+            console.log('DOM loaded, initializing dropdowns...');
+            console.log('Language button element:', languageSelectBtn);
+            console.log('Language options element:', languageSelectOptions);
+            console.log('Station button element:', stationSelectBtn);
+            console.log('Station options element:', stationSelectOptions);
+            
             populateLanguageDropdown();
             await loadStationsForLanguage(currentLanguage);
+            
+            console.log('Dropdown initialization complete');
         });

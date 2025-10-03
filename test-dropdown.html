@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <style>
+        .radio-dropdown {
+            position: relative;
+            width: 200px;
+            margin: 20px;
+        }
+        .radio-dropdown-btn {
+            width: 100%;
+            background-color: #0077b6;
+            color: white;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .radio-dropdown-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background-color: #03045e;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-height: 120px;
+            overflow-y: auto;
+            margin-top: 5px;
+            z-index: 50;
+            display: none;
+            color: white;
+        }
+        .radio-dropdown-option {
+            padding: 8px 10px;
+            cursor: pointer;
+            color: white;
+        }
+        .radio-dropdown-option:hover {
+            background-color: #0096c7;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dropdown Test</h1>
+    
+    <div class="radio-dropdown">
+        <button id="language-select-btn" class="radio-dropdown-btn">Select Language <i>▼</i></button>
+        <div id="language-select-options" class="radio-dropdown-options"></div>
+    </div>
+    
+    <div class="radio-dropdown">
+        <button id="station-select-btn" class="radio-dropdown-btn">Select Station <i>▼</i></button>
+        <div id="station-select-options" class="radio-dropdown-options"></div>
+    </div>
+    
+    <div id="output"></div>
+    
+    <script>
+        const languageSelectBtn = document.getElementById('language-select-btn');
+        const languageSelectOptions = document.getElementById('language-select-options');
+        const stationSelectBtn = document.getElementById('station-select-btn');
+        const stationSelectOptions = document.getElementById('station-select-options');
+        const output = document.getElementById('output');
+        
+        const LANGUAGE_FILES = {
+            'Dutch': 'https://raw.githubusercontent.com/simsonpeder/Tcradios/refs/heads/main/languages/dutch.json',
+            'English': 'https://raw.githubusercontent.com/simsonpeder/Tcradios/refs/heads/main/languages/english.json',
+            'Hindi': 'https://raw.githubusercontent.com/simsonpeder/Tcradios/refs/heads/main/languages/hindi.json',
+            'Malayalam': 'https://raw.githubusercontent.com/simsonpeder/Tcradios/refs/heads/main/languages/malayalam.json',
+            'Sinhala': 'https://raw.githubusercontent.com/simsonpeder/Tcradios/refs/heads/main/languages/sinhala.json'
+        };
+        
+        let radioStations = [];
+        let currentLanguage = 'English';
+        
+        function populateLanguageDropdown() {
+            console.log('Populating language dropdown...');
+            output.innerHTML += 'Populating language dropdown...<br>';
+            
+            languageSelectOptions.innerHTML = '';
+            Object.keys(LANGUAGE_FILES).forEach(languageName => {
+                const option = document.createElement('div');
+                option.className = 'radio-dropdown-option';
+                option.textContent = languageName;
+                option.dataset.language = languageName;
+                option.addEventListener('click', () => {
+                    selectLanguage(languageName);
+                });
+                languageSelectOptions.appendChild(option);
+                output.innerHTML += `Added language option: ${languageName}<br>`;
+            });
+            console.log(`Language dropdown populated with ${Object.keys(LANGUAGE_FILES).length} options`);
+        }
+        
+        async function loadStationsForLanguage(languageName) {
+            console.log(`Loading stations for language: ${languageName}`);
+            output.innerHTML += `Loading stations for ${languageName}...<br>`;
+            
+            try {
+                const url = LANGUAGE_FILES[languageName];
+                const response = await fetch(url);
+                const stations = await response.json();
+                radioStations = stations;
+                console.log(`Loaded ${stations.length} stations`);
+                output.innerHTML += `Loaded ${stations.length} stations<br>`;
+                populateStationDropdown();
+            } catch (error) {
+                console.error('Error loading stations:', error);
+                output.innerHTML += `Error loading stations: ${error.message}<br>`;
+            }
+        }
+        
+        function populateStationDropdown() {
+            console.log('Populating station dropdown...');
+            output.innerHTML += 'Populating station dropdown...<br>';
+            
+            stationSelectOptions.innerHTML = '';
+            radioStations.forEach((station, index) => {
+                const option = document.createElement('div');
+                option.className = 'radio-dropdown-option';
+                option.textContent = station.name || `Station ${index + 1}`;
+                option.dataset.index = index;
+                option.addEventListener('click', () => {
+                    console.log(`Selected station: ${station.name}`);
+                    output.innerHTML += `Selected station: ${station.name}<br>`;
+                });
+                stationSelectOptions.appendChild(option);
+            });
+            console.log(`Station dropdown populated with ${radioStations.length} stations`);
+            output.innerHTML += `Station dropdown populated with ${radioStations.length} stations<br>`;
+        }
+        
+        function selectLanguage(languageName) {
+            currentLanguage = languageName;
+            languageSelectBtn.innerHTML = `${languageName} <i>▼</i>`;
+            languageSelectOptions.style.display = 'none';
+            loadStationsForLanguage(languageName);
+        }
+        
+        function toggleLanguageDropdown() {
+            const isVisible = languageSelectOptions.style.display === 'block';
+            languageSelectOptions.style.display = isVisible ? 'none' : 'block';
+            console.log(`Language dropdown ${isVisible ? 'closed' : 'opened'}`);
+        }
+        
+        function toggleStationDropdown() {
+            const isVisible = stationSelectOptions.style.display === 'block';
+            stationSelectOptions.style.display = isVisible ? 'none' : 'block';
+            console.log(`Station dropdown ${isVisible ? 'closed' : 'opened'}`);
+        }
+        
+        // Event listeners
+        languageSelectBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleLanguageDropdown();
+        });
+        
+        stationSelectBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleStationDropdown();
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.radio-dropdown')) {
+                languageSelectOptions.style.display = 'none';
+                stationSelectOptions.style.display = 'none';
+            }
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('DOM loaded, initializing...');
+            output.innerHTML += 'DOM loaded, initializing...<br>';
+            
+            populateLanguageDropdown();
+            await loadStationsForLanguage(currentLanguage);
+            
+            console.log('Initialization complete');
+            output.innerHTML += 'Initialization complete<br>';
+        });
+    </script>
+</body>
+</html>
