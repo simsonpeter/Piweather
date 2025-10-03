@@ -1422,16 +1422,21 @@
 
         function populateLanguageDropdown() {
             languageSelectOptions.innerHTML = '';
-            Object.keys(LANGUAGE_FILES).forEach((languageName) => {
-                const option = document.createElement('div');
-                option.className = 'radio-dropdown-option';
-                option.textContent = languageName;
-                option.dataset.language = languageName;
-                option.addEventListener('click', () => {
-                    selectLanguage(languageName);
+            const languageNames = Object.keys(LANGUAGE_FILES || {});
+            if (languageNames.length === 0) {
+                languageSelectOptions.innerHTML = '<div class="radio-dropdown-option" style="pointer-events:none; opacity:0.7;">No languages available</div>';
+            } else {
+                languageNames.forEach((languageName) => {
+                    const option = document.createElement('div');
+                    option.className = 'radio-dropdown-option';
+                    option.textContent = languageName;
+                    option.dataset.language = languageName;
+                    option.addEventListener('click', () => {
+                        selectLanguage(languageName);
+                    });
+                    languageSelectOptions.appendChild(option);
                 });
-                languageSelectOptions.appendChild(option);
-            });
+            }
             languageSelectBtn.innerHTML = `${currentLanguage} <i class="fas fa-chevron-up"></i>`;
         }
 
@@ -1476,6 +1481,14 @@
                 }
             } catch (err) {
                 console.error('Failed to load stations for language', languageName, err);
+                // Fallback UI so the dropdown is not empty
+                radioStations = [];
+                populateStationDropdown();
+                if (stationSelectOptions) {
+                    stationSelectOptions.innerHTML = '<div class="radio-dropdown-option" style="pointer-events:none; opacity:0.7;">Unable to load stations. Check network.</div>';
+                }
+                if (currentStationName) currentStationName.textContent = 'No stations available';
+                if (stationIcon) stationIcon.style.display = 'none';
             }
         }
 
