@@ -1706,6 +1706,14 @@
             } catch (error) {
                 console.error('Error loading stations for language:', error);
                 showNotification('Failed to load stations for selected language', 'error');
+                // Fallback UI so the dropdown is not empty
+                radioStations = [];
+                rebuildStationDropdown();
+                if (stationSelectOptions) {
+                    stationSelectOptions.innerHTML = '<div class="radio-dropdown-option" style="pointer-events:none; opacity:0.7;">Unable to load stations. Check network.</div>';
+                }
+                if (currentStationName) currentStationName.textContent = 'No stations available';
+                if (stationIcon) stationIcon.style.display = 'none';
             }
         }
 
