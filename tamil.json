@@ -1,0 +1,72 @@
+[
+    {
+        "name": "Sun Music",
+        "url": "https://stream.live.vc.bbcmedia.co.uk/bbc_tamil_service",
+        "logo": "https://i.imgur.com/sunmusic.png",
+        "genre": "Tamil Entertainment",
+        "metadata": true
+    },
+    {
+        "name": "Tamil FM Online",
+        "url": "https://stream.live.vc.bbcmedia.co.uk/bbc_tamil_delhi",
+        "logo": "https://i.imgur.com/tamilfm.png",
+        "genre": "Tamil Entertainment",
+        "metadata": true
+    },
+    {
+        "name": "Chennai FM",
+        "url": "https://live.mystreamplayer.com/tamilfmradio",
+        "logo": "https://i.imgur.com/chennaifm.png",
+        "genre": "Taxi Driver Tamil",
+        "metadata": true
+    },
+    {
+        "name": "Melody FM Tamil",
+        "url": "https://live.mystreamplayer.com/tamilmelody",
+        "logo": "https://i.imgur.com/melodyfm.png",
+        "genre": "Tamil Melody",
+        "metadata": true
+    },
+    {
+        "name": "Chennai Tamil FM",
+        "url": "https://live.mystreamplayer.com/taxidriverradio",
+        "logo": "https://i.imgur.com/taxidriver.png",
+        "genre": "Taxi Driver Tamil",
+        "metadata": true
+    },
+    {
+        "name": "Tamil Classic Hits",
+        "url": "https://live.mystreamplayer.com/tamilclassicfm",
+        "logo": "https://i.imgur.com/tamilclassic.png",
+        "genre": "Tamil Classic",
+        "metadata": true
+    },
+    {
+        "name": "FM 101.3 Chennai",
+        "url": "https://stream.fm1013chennai.com/live",
+        "logo": "https://i.imgur.com/fm1013.png",
+        "genre": "Tamil Hit Music",
+        "metadata": true
+    },
+    {
+        "name": "Tamil Christian Radio",
+        "url": "https://stream.tamilchristian.org/live",
+        "logo": "https://i.imgur.com/tamilchristian.png",
+        "genre": "Tamil Christian",
+        "metadata": true
+    },
+    {
+        "name": "Tamil Devotional FM",
+        "url": "https://stream.tamildevotional.com/devotional",
+        "logo": "https://i.imgur.com/tamildevotional.png",
+        "genre": "Tamil Temple Music",
+        "metadata": true
+    },
+    {
+        "name": "Madras FM Tamil",
+        "url": "https://stream.madrasfm.com/madras",
+        "logo": "https://i.imgur.com/madrasfm.png",
+        "genre": "Tamil Hit Music",
+        "metadata": true
+    }
+]

@@ -481,6 +481,7 @@
             width: 100%;
             height: 5px;
             -webkit-appearance: none;
+            appearance: none;
             background: var(--input-bg);
             border-radius: 3px;
             outline: none;
@@ -518,8 +519,7 @@
         }
         .radio-dropdown-options {
             position: absolute;
-            top: 100%; /* Opens downward */
-            bottom: auto;
+            bottom: 100%;
             left: 0;
             width: 100%;
             background-color: var(--card-bg);
@@ -527,11 +527,9 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             max-height: 120px;
             overflow-y: auto;
-            margin-top: 5px; /* Space between button and dropdown */
+            margin-bottom: 5px;
             z-index: 50;
             display: none;
-            /* --- DEBUG BORDER --- */
-            border: 2px solid red;
         }
         .radio-dropdown-options::-webkit-scrollbar {
             width: 5px;
@@ -1151,7 +1149,7 @@
                                 </div>
                                 <div class="radio-dropdown">
                                     <button id="station-select-btn" class="radio-dropdown-btn">Select Station <i class="fas fa-chevron-down"></i></button>
-                                    <div id="station-select-options" class="radio-dropdown-options" style="top: 100%;"></div>
+                                    <div id="station-select-options" class="radio-dropdown-options"></div>
                                 </div>
                             </div>
                         </div>
@@ -1279,6 +1277,8 @@
         const pressureEl = document.getElementById('pressure');
         const weatherCityDisplay = document.getElementById('weather-city-display');
         const weatherCityInput = document.getElementById('weather-city-input');
+        const languageSelectBtn = document.getElementById('language-select-btn');
+        const languageSelectOptions = document.getElementById('language-select-options');
         const stationSelectBtn = document.getElementById('station-select-btn');
         const stationSelectOptions = document.getElementById('station-select-options');
         const playBtn = document.getElementById('radio-play-btn');
@@ -1346,12 +1346,6 @@
         const screensaverDisplay = document.getElementById('screensaver-display');
         // NEWS TICKER DOM ELEMENT - NEW
         const newsTicker = document.getElementById('news-ticker');
-
-        // --- NEW LANGUAGE SELECTOR DOM ELEMENTS ---
-        const languageSelectBtn = document.getElementById('language-select-btn');
-        const languageSelectOptions = document.getElementById('language-select-options');
-        // --- END NEW LANGUAGE SELECTOR DOM ELEMENTS ---
-
         // State
         let isPlaying = false;
         let currentStationIndex = -1;
@@ -1373,12 +1367,13 @@
         // END NEW ALARM STATE
         let currentCity = localStorage.getItem('weatherCity') || 'Mortsel';
         let weatherData = null; // Store weather data
+        let currentLanguage = 'Tamil'; // Default to Tamil
+        let languageRadioStations = {}; // Cache for each language's stations
         const DEFAULT_SCREENSAVER_TIMEOUT = 2 * 60 * 1000; // 2 minutes in milliseconds
         let screensaverEnabled = true;
         const YOUTUBE_API_KEY = 'AIzaSyBwphUWyr9U0Eb8gsLN67ojZDA_rOHU3TA'; // WARNING: This is a public key, do not use in production without a backend proxy.
         // NEWS API KEY - NEW
         const NEWS_API_KEY = '7446c8e28d503d82c84577c80c13c8fc';
-
         // Define the list of languages and their URLs
         const LANGUAGE_FILES = {
             'Dutch': 'https://raw.githubusercontent.com/simsonpeter/Tcradios/refs/heads/main/languages/dutch.json',
@@ -1388,7 +1383,8 @@
             'Sinhala': 'https://raw.githubusercontent.com/simsonpeter/Tcradios/refs/heads/main/languages/sinhala.json',
             'Tamil': './tamil.json'
         };
-
+        
+        const RADIO_STATIONS_URL = LANGUAGE_FILES['Tamil']; // Default to Tamil
         let touchStartY = 0;
         let isSwiping = false;
         // Calendar State
@@ -1398,33 +1394,168 @@
         let specialDays = { '2025-08-15': 'Assumption Day', '2025-12-25': 'Christmas', '2026-01-01': 'New Year' };
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        
-        // Language and Radio State
-        let currentLanguage = 'Tamil'; // Default to Tamil
-        let languageRadioStations = {}; // Cache for each language's stations
-
+        // Virtual Keyboard State
+        let activeInput = null;
+        let isCaps = false;
+        let isShift = false;
+        let isNumbers = false;
         // Initialize function
         function init() {
             updateClock();
             loadLanguageOptions();
-            loadRadioStations('Tamil'); // Start with Tamil
+            loadRadioStations();
             getWeather(currentCity);
             setupEventListeners();
+            loadYouTubeAPI();
+            renderCalendar();
+            // Set initial volume
+            radioPlayer.volume = volumeSlider.value;
             // Check for saved theme
             const savedTheme = localStorage.getItem('dashboardTheme') || 'ocean';
             setTheme(savedTheme);
-            // Set initial volume
-            radioPlayer.volume = volumeSlider.value;
             // Initial city display
             weatherCityDisplay.textContent = currentCity;
             // Set interval for weather refresh
             setInterval(() => getWeather(currentCity), 900000);
+            // Set interval for event reminder checks
+            setInterval(checkReminders, 60000);
             // Initialize screensaver with default timeout
             resetScreensaverTimer();
+            // Load screensaver settings from localStorage
+            loadScreensaverSettings();
+            // Load news ticker - MODIFIED
+            fetchNews();
+        }
+        // Load screensaver settings from localStorage
+        function loadScreensaverSettings() {
+            const savedSettings = localStorage.getItem('screensaverSettings');
+            if (savedSettings) {
+                const settings = JSON.parse(savedSettings);
+                screensaverEnabled = settings.enabled;
+                if (settings.timeout) {
+                    screensaverInput.value = settings.timeout;
+                    screensaverDisplay.textContent = `Screensaver set for ${settings.timeout}`;
+                }
+            } else {
+                // Default settings
+                screensaverEnabled = true;
+                screensaverDisplay.textContent = 'Screensaver enabled (2 min default)';
+            }
+        }
+        // Save screensaver settings to localStorage
+        function saveScreensaverSettings() {
+            const settings = {
+                enabled: screensaverEnabled,
+                timeout: screensaverInput.value || null
+            };
+            localStorage.setItem('screensaverSettings', JSON.stringify(settings));
+        }
+        // Show notification
+        function showNotification(message, type = 'info') {
+            notificationMessage.textContent = message;
+            // Set icon and color based on type
+            switch(type) {
+                case 'success':
+                    notificationIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                    notification.style.borderLeftColor = 'var(--success)';
+                    break;
+                case 'warning':
+                    notificationIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                    notification.style.borderLeftColor = 'var(--warning)';
+                    break;
+                case 'error':
+                    notificationIcon.innerHTML = '<i class="fas fa-times-circle"></i>';
+                    notification.style.borderLeftColor = 'var(--danger)';
+                    break;
+                default:
+                    notificationIcon.innerHTML = '<i class="fas fa-info-circle"></i>';
+                    notification.style.borderLeftColor = 'var(--primary)';
+            }
+            notification.classList.add('show');
+            // Auto hide after 3 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        // Clock function
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            clockEl.textContent = `${hours.toString().padStart(2, '0')}:${minutes}`;
+            // Update date
+            const dayName = days[now.getDay()];
+            const monthName = months[now.getMonth()];
+            const date = now.getDate();
+            const year = now.getFullYear();
+            dateEl.textContent = `${dayName}, ${monthName} ${date}, ${year}`;
+            // Check if timer is set and time is up
+            if (timerEndTime && now >= timerEndTime && isPlaying) {
+                stopRadio();
+                clearTimer();
+                showNotification('Radio stopped by timer', 'info');
+            }
+            // NEW ALARM CHECK
+            if (alarmTime) {
+                const nowString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+                if (nowString === alarmTime) {
+                    // Trigger the alarm
+                    if (!isPlaying) {
+                        if (currentStationIndex >= 0) {
+                            playStation();
+                            showNotification(`Radio alarm triggered! Playing: ${radioStations[currentStationIndex].name}`, 'success');
+                        } else {
+                            showNotification('Alarm triggered, but no station selected!', 'warning');
+                        }
+                    } else {
+                        showNotification('Radio alarm triggered! Radio is already playing.', 'info');
+                    }
+                    // Clear the alarm after it triggers
+                    clearAlarm();
+                }
+            }
+            // END NEW ALARM CHECK
+            // Update timer display if active
+            if (timerEndTime) {
+                updateTimerDisplay();
+            }
             setTimeout(updateClock, 1000);
         }
+        // Weather functions
+        async function getWeather(city) {
+            const apiKey = '03f98efcfade4eccb3bb0689975585d5';
+            const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+            loadingIndicator.classList.add('show');
+            try {
+                const response = await fetch(weatherUrl);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                weatherData = data; // Store the weather data
+                currentCity = data.name;
+                localStorage.setItem('weatherCity', currentCity);
+                weatherCityDisplay.textContent = currentCity;
+                tempEl.textContent = `${Math.round(data.main.temp)}°`;
+                humidityEl.textContent = data.main.humidity;
+                windEl.textContent = Math.round(data.wind.speed * 3.6);
+                feelsLikeEl.textContent = Math.round(data.main.feels_like);
+                tempMaxEl.textContent = Math.round(data.main.temp_max);
+                tempMinEl.textContent = Math.round(data.main.temp_min);
+                pressureEl.textContent = data.main.pressure;
+                weatherIcon.src = `http://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`;
+                weatherIcon.style.display = 'block';
+                showNotification(`Weather updated for ${data.name}`, 'success');
+            } catch (error) {
+                console.error('Error fetching weather:', error);
+                showNotification(`Failed to fetch weather data: ${error.message}`, 'error');
+            } finally {
+                loadingIndicator.classList.remove('show');
+            }
+        }
 
-        // Language loading functions
+        // Language functions
         async function loadLanguageOptions() {
             try {
                 languageSelectOptions.innerHTML = '';
@@ -1436,7 +1567,7 @@
                     option.addEventListener('click', () => selectLanguage(lang));
                     languageSelectOptions.appendChild(option);
                 });
-                // Set default language
+                // Set default language display
                 selectLanguage(currentLanguage);
             } catch (error) {
                 console.error('Error loading language options:', error);
@@ -1449,12 +1580,11 @@
             languageSelectOptions.style.display = 'none';
             
             // Load stations for the selected language
-            await loadRadioStations(language);
+            await loadRadioStationsForLanguage(language);
             showNotification(`Loaded ${language} radio stations`, 'success');
         }
 
-        // Radio functions
-        async function loadRadioStations(language) {
+        async function loadRadioStationsForLanguage(language) {
             try {
                 const url = LANGUAGE_FILES[language];
                 let stations;
@@ -1497,56 +1627,54 @@
             }
         }
 
+        // Radio functions
+        async function loadRadioStations() {
+            // Use the new language-based function
+            await loadRadioStationsForLanguage(currentLanguage);
+        }
         function selectStation(index) {
             currentStationIndex = index;
             const station = radioStations[currentStationIndex];
             if (!station) return;
-            
             currentStationName.textContent = station.name;
             stationSelectBtn.innerHTML = `${station.name} <i class="fas fa-chevron-down"></i>`;
-            
-            // Handle station icon/logo
+            // Correctly fetch and display the logo from the JSON
             if (station.logo) {
                 stationIcon.src = station.logo;
                 stationIcon.style.display = 'block';
             } else {
                 stationIcon.style.display = 'none';
             }
-            
             stationSelectOptions.style.display = 'none';
-            
-            // If currently playing, switch to new station
             if (isPlaying) {
-                radioPlayer.src = station.url;
+                playStation();
             }
+            showNotification(`Selected station: ${station.name}`, 'info');
         }
-
         function playStation() {
-            if (currentStationIndex < 0 || !radioStations[currentStationIndex]) return;
-            
             const station = radioStations[currentStationIndex];
+            if (!station) return;
             radioPlayer.src = station.url;
-            radioPlayer.play().then(() => {
+            radioPlayer.play()
+            .then(() => {
                 isPlaying = true;
                 playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                showNotification(`Now playing: ${station.name}`, 'success');
-            }).catch(error => {
-                console.error('Error playing radio:', error);
-                showNotification(`Failed to play ${station.name}`, 'error');
+                showNotification(`Playing: ${station.name}`, 'success');
+            })
+            .catch(error => {
+                console.error('Playback failed:', error);
+                showNotification('Failed to play radio station', 'error');
             });
         }
-
         function stopRadio() {
             radioPlayer.pause();
-            radioPlayer.src = '';
             isPlaying = false;
             playBtn.innerHTML = '<i class="fas fa-play"></i>';
-            showNotification('Radio stopped', 'info');
         }
-
-        function togglePlayPause() {
+        function togglePlayback() {
             if (isPlaying) {
                 stopRadio();
+                showNotification('Radio paused', 'info');
             } else {
                 if (currentStationIndex >= 0) {
                     playStation();
@@ -1555,18 +1683,913 @@
                 }
             }
         }
-
         function playPreviousStation() {
             if (radioStations.length === 0) return;
             currentStationIndex = (currentStationIndex - 1 + radioStations.length) % radioStations.length;
             selectStation(currentStationIndex);
             playStation();
         }
-
         function playNextStation() {
             if (radioStations.length === 0) return;
             currentStationIndex = (currentStationIndex + 1) % radioStations.length;
             selectStation(currentStationIndex);
             playStation();
         }
-
+        // Timer functions
+        function setTimer() {
+            const timerValue = timerInput.value;
+            if (!timerValue) {
+                showNotification('Please set a time', 'warning');
+            }
+            const [hours, minutes] = timerValue.split(':').map(Number);
+            const now = new Date();
+            // Create timer end time (today at the specified time)
+            timerEndTime = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate(),
+                hours,
+                minutes,
+                0
+                );
+                // If the time has already passed today, set for tomorrow
+                if (timerEndTime <= now) {
+                    timerEndTime.setDate(timerEndTime.getDate() + 1);
+                }
+                // Start timer display update
+                if (timerInterval) clearInterval(timerInterval);
+                timerInterval = setInterval(updateTimerDisplay, 1000);
+                updateTimerDisplay();
+                showNotification(`Timer set to stop at ${timerEndTime.toLocaleTimeString()}`, 'success');
+                settingsDropdown.classList.remove('show');
+            }
+            function clearTimer() {
+                timerEndTime = null;
+                if (timerInterval) clearInterval(timerInterval);
+                timerDisplay.textContent = 'No timer set';
+                timerInput.value = '';
+                showNotification('Timer cleared', 'info');
+            }
+            function updateTimerDisplay() {
+                if (!timerEndTime) return;
+                const now = new Date();
+                const diff = timerEndTime - now;
+                if (diff <= 0) {
+                    timerDisplay.textContent = 'Time expired';
+                    return;
+                }
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                timerDisplay.textContent = `Stops in ${hours}h ${minutes}m ${seconds}s`;
+            }
+        // NEW ALARM FUNCTIONS
+        function setAlarm() {
+            const alarmValue = alarmInput.value;
+            if (!alarmValue) {
+                showNotification('Please set an alarm time', 'warning');
+                return;
+            }
+            alarmTime = alarmValue; // Store as "HH:MM" string
+            if (alarmInterval) clearInterval(alarmInterval);
+            alarmInterval = setInterval(updateAlarmDisplay, 1000);
+            updateAlarmDisplay();
+            showNotification(`Radio alarm set for ${alarmTime}`, 'success');
+            settingsDropdown.classList.remove('show');
+        }
+        function clearAlarm() {
+            alarmTime = null;
+            if (alarmInterval) clearInterval(alarmInterval);
+            alarmDisplay.textContent = 'No alarm set';
+            alarmInput.value = '';
+            showNotification('Alarm cleared', 'info');
+        }
+        function updateAlarmDisplay() {
+            if (!alarmTime) return;
+            const now = new Date();
+            const [alarmHours, alarmMinutes] = alarmTime.split(':').map(Number);
+            // Create a Date object for today at the alarm time
+            const alarmDate = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate(),
+                alarmHours,
+                alarmMinutes,
+                0
+            );
+            // If the alarm time has already passed today, calculate for tomorrow
+            if (alarmDate <= now) {
+                alarmDate.setDate(alarmDate.getDate() + 1);
+            }
+            const diff = alarmDate - now;
+            if (diff <= 0) {
+                alarmDisplay.textContent = 'Alarm triggered';
+                return;
+            }
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            alarmDisplay.textContent = `Starts in ${hours}h ${minutes}m ${seconds}s`;
+        }
+        // END NEW ALARM FUNCTIONS
+        // Screensaver functions
+        function setScreensaverTimer() {
+            const timeValue = screensaverInput.value;
+            if (!timeValue) {
+                showNotification('Please enter a screensaver time', 'warning');
+                return;
+            }
+            const [hours, minutes] = timeValue.split(':').map(Number);
+            const now = new Date();
+            screensaverEndTime = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate(),
+                hours,
+                minutes,
+                0
+            );
+            if (screensaverEndTime <= now) {
+                screensaverEndTime.setDate(screensaverEndTime.getDate() + 1);
+            }
+            // Clear existing timers
+            if (screensaverInterval) clearInterval(screensaverInterval);
+            if (screensaverTimeout) clearTimeout(screensaverTimeout);
+            screensaverInterval = setInterval(updateScreensaverDisplay, 1000);
+            updateScreensaverDisplay();
+            showNotification(`Screensaver timer set for ${screensaverEndTime.toLocaleTimeString()}`, 'success');
+            settingsDropdown.classList.remove('show');
+            // Save settings
+            screensaverEnabled = true;
+            saveScreensaverSettings();
+            // Reset inactivity timer
+            resetScreensaverTimer();
+        }
+        function clearScreensaverTimer() {
+            screensaverEndTime = null;
+            if (screensaverInterval) clearInterval(screensaverInterval);
+            if (screensaverTimeout) clearTimeout(screensaverTimeout);
+            screensaverDisplay.textContent = 'Screensaver not set';
+            screensaverInput.value = '';
+            showNotification('Screensaver timer cleared', 'info');
+            // Save settings
+            screensaverEnabled = true;
+            saveScreensaverSettings();
+            // Reset inactivity timer
+            resetScreensaverTimer();
+        }
+        function disableScreensaver() {
+            clearScreensaverTimer();
+            if (screensaverInactivityTimeout) {
+                clearTimeout(screensaverInactivityTimeout);
+                screensaverInactivityTimeout = null;
+            }
+            screensaverEnabled = false;
+            screensaverDisplay.textContent = 'Screensaver disabled';
+            showNotification('Screensaver disabled', 'info');
+            settingsDropdown.classList.remove('show');
+            // Save settings
+            saveScreensaverSettings();
+        }
+        function updateScreensaverDisplay() {
+            if (!screensaverEndTime) return;
+            const now = new Date();
+            const diff = screensaverEndTime - now;
+            if (diff <= 0) {
+                activateScreensaver();
+                screensaverDisplay.textContent = 'Time expired';
+                clearScreensaverTimer();
+                return;
+            }
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            screensaverDisplay.textContent = `Starts in ${hours}h ${minutes}m ${seconds}s`;
+        }
+        function activateScreensaver() {
+            screensaverEl.style.display = 'flex';
+            updateScreensaverContent();
+            screensaverTimeout = setInterval(updateScreensaverContent, 1000);
+        }
+        function updateScreensaverContent() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            screensaverClockEl.textContent = `${hours}:${minutes}:${seconds}`;
+            if (weatherData) {
+                screensaverWeatherIcon.src = `http://openweathermap.org/img/wn/${weatherData.weather[0].icon}@4x.png`;
+                screensaverWeatherIcon.style.display = 'block';
+                screensaverTemperature.textContent = `${Math.round(weatherData.main.temp)}°`;
+                screensaverCity.textContent = weatherData.name;
+            } else {
+                screensaverWeatherIcon.style.display = 'none';
+                screensaverTemperature.textContent = '--°';
+                screensaverCity.textContent = '';
+            }
+        }
+        function resetScreensaverTimer() {
+            // Clear any existing timeout
+            if (screensaverInactivityTimeout) {
+                clearTimeout(screensaverInactivityTimeout);
+            }
+            // Hide screensaver if it's active
+            if (screensaverEl.style.display === 'flex') {
+                screensaverEl.style.display = 'none';
+                if (screensaverTimeout) clearTimeout(screensaverTimeout);
+            }
+            // Only set new timeout if screensaver is enabled
+            if (screensaverEnabled) {
+                screensaverInactivityTimeout = setTimeout(() => {
+                    activateScreensaver();
+                }, DEFAULT_SCREENSAVER_TIMEOUT);
+            }
+        }
+        // YouTube functions
+        function loadYouTubeAPI() {
+            const tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            const firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            window.onYouTubeIframeAPIReady = function() {
+                youtubePlayer = new YT.Player('youtube-player', {
+                    height: '100%',
+                    width: '100%',
+                    playerVars: {
+                        'autoplay': 0,
+                        'controls': 0,
+                        'disablekb': 1,
+                        'modestbranding': 1,
+                        'rel': 0,
+                        'fs': 0 // We're handling fullscreen with our own button
+                    },
+                    events: {
+                        'onReady': onPlayerReady,
+                        'onStateChange': onPlayerStateChange
+                    }
+                });
+            };
+        }
+        function onPlayerReady(event) {
+            console.log('YouTube player ready');
+        }
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                youtubePlayBtn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+            } else {
+                youtubePlayBtn.innerHTML = '<i class="fas fa-play"></i> Play';
+            }
+        }
+        async function searchYouTube() {
+            const query = youtubeSearchInput.value.trim();
+            if (!query) {
+                showNotification('Please enter a search term', 'warning');
+                return;
+            }
+            try {
+                const response = await fetch(
+                    `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}&type=video`
+                    );
+                    const data = await response.json();
+                    if (data.items && data.items.length > 0) {
+                        youtubeSearchResults = data.items;
+                        currentVideoIndex = -1;
+                        displayYouTubeResults();
+                        showNotification(`Found ${data.items.length} videos`, 'success');
+                    } else {
+                        showNotification('No videos found', 'warning');
+                    }
+                } catch (error) {
+                    console.error('Error searching YouTube:', error);
+                    showNotification('Failed to search YouTube', 'error');
+                }
+            }
+        function displayYouTubeResults() {
+            youtubeResults.innerHTML = '';
+            if (youtubeSearchResults.length === 0) {
+                youtubeResults.innerHTML = '<div style="padding: 15px; text-align: center;">No results found</div>';
+                return;
+            }
+            youtubeSearchResults.forEach((item, index) => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'youtube-result-item';
+                resultItem.innerHTML = `
+                <div style="font-weight: bold;">${item.snippet.title}</div>
+                <div style="font-size: 0.8em; color: var(--secondary);">${item.snippet.channelTitle}</div>
+                `;
+                resultItem.addEventListener('click', () => {
+                    playYouTubeVideo(index);
+                    youtubePlayerContainer.style.display = 'flex';
+                    youtubeResults.style.display = 'none';
+                });
+                youtubeResults.appendChild(resultItem);
+            });
+            youtubeResults.style.display = 'block';
+            youtubePlayerContainer.style.display = 'none';
+        }
+        function playYouTubeVideo(index) {
+            if (index < 0 || index >= youtubeSearchResults.length) return;
+            currentVideoIndex = index;
+            const videoId = youtubeSearchResults[index].id.videoId;
+            const videoTitle = youtubeSearchResults[index].snippet.title;
+            if (youtubePlayer) {
+                youtubePlayer.loadVideoById(videoId);
+                showNotification(`Playing: ${videoTitle}`, 'success');
+            }
+        }
+        function toggleYouTubePlayback() {
+            if (!youtubePlayer) return;
+            if (youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+                youtubePlayer.pauseVideo();
+                showNotification('Video paused', 'info');
+            } else {
+                youtubePlayer.playVideo();
+                showNotification('Video playing', 'info');
+            }
+        }
+        function playPreviousVideo() {
+            if (youtubeSearchResults.length === 0) return;
+            let newIndex = currentVideoIndex - 1;
+            if (newIndex < 0) newIndex = youtubeSearchResults.length - 1;
+            playYouTubeVideo(newIndex);
+        }
+        function playNextVideo() {
+            if (youtubeSearchResults.length === 0) return;
+            let newIndex = currentVideoIndex + 1;
+            if (newIndex >= youtubeSearchResults.length) newIndex = 0;
+            playYouTubeVideo(newIndex);
+        }
+        // Corrected Fullscreen function
+        function toggleFullscreen() {
+            const iframe = youtubePlayer.getIframe();
+            if (iframe) {
+                if (!document.fullscreenElement) {
+                    iframe.requestFullscreen().catch(err => {
+                        console.error('Error attempting to enable fullscreen:', err);
+                        showNotification('Fullscreen failed', 'error');
+                    });
+                } else {
+                    document.exitFullscreen();
+                }
+            }
+        }
+        // Calendar functions
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            calendarMonthYear.textContent = `${months[month]} ${year}`;
+            // Clear previous grid
+            const existingDays = calendarGrid.querySelectorAll('.calendar-day');
+            existingDays.forEach(day => day.remove());
+            const firstDayOfMonth = new Date(year, month, 1);
+            const lastDayOfMonth = new Date(year, month + 1, 0);
+            const daysInMonth = lastDayOfMonth.getDate();
+            const firstDayOfWeek = firstDayOfMonth.getDay();
+            // 0 for Sunday, 1 for Monday etc.
+            // Calculate offset for Monday start
+            let offset = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+            // Render leading days from previous month
+            const prevMonthLastDay = new Date(year, month, 0).getDate();
+            for (let i = 0; i < offset; i++) {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'calendar-day other-month';
+                dayEl.textContent = prevMonthLastDay - offset + 1 + i;
+                calendarGrid.appendChild(dayEl);
+            }
+            // Render current month's days
+            const today = new Date();
+            const todayDay = today.getDate();
+            const todayMonth = today.getMonth();
+            const todayYear = today.getFullYear();
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'calendar-day';
+                dayEl.innerHTML = `<span class="day-number">${i}</span>`;
+                dayEl.dataset.date = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                if (i === todayDay && month === todayMonth && year === todayYear) {
+                    dayEl.classList.add('current-day');
+                }
+                // Add special day highlight
+                if (specialDays[dayEl.dataset.date]) {
+                    dayEl.classList.add('special-day');
+                    dayEl.title = specialDays[dayEl.dataset.date];
+                }
+                // Add event markers and event count
+                if (events[dayEl.dataset.date] && events[dayEl.dataset.date].length > 0) {
+                    dayEl.classList.add('has-events');
+                    const eventCount = events[dayEl.dataset.date].length;
+                    dayEl.innerHTML += `<div class="day-event-count">${eventCount} event${eventCount > 1 ? 's' : ''}</div>`;
+                }
+                // Add event listener to each day
+                dayEl.addEventListener('click', () => {
+                    selectCalendarDay(dayEl);
+                });
+                calendarGrid.appendChild(dayEl);
+            }
+            // Render trailing days from next month
+            const totalDaysRendered = offset + daysInMonth;
+            const remainingCells = 42 - totalDaysRendered;
+            for (let i = 1; i <= remainingCells; i++) {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'calendar-day other-month';
+                dayEl.textContent = i;
+                calendarGrid.appendChild(dayEl);
+            }
+        }
+        function changeMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            renderCalendar();
+        }
+        // New Calendar Event Functions
+        function selectCalendarDay(dayEl) {
+            // Clear previous selection
+            if (selectedCalendarDay) {
+                selectedCalendarDay.classList.remove('selected');
+            }
+            // Hide event manager if an "other month" day is clicked
+            if (dayEl.classList.contains('other-month')) {
+                closeEventManager();
+                return;
+            }
+            selectedCalendarDay = dayEl;
+            selectedCalendarDay.classList.add('selected');
+            eventManager.classList.add('show');
+            eventDescriptionInput.focus();
+            // Update event list for the selected day
+            const dayKey = dayEl.dataset.date;
+            displayEventsForDay(dayKey);
+        }
+        function closeEventManager() {
+            eventManager.classList.remove('show');
+            if (selectedCalendarDay) {
+                selectedCalendarDay.classList.remove('selected');
+                selectedCalendarDay = null;
+            }
+        }
+        function displayEventsForDay(dayKey) {
+            eventList.innerHTML = '';
+            const dayEvents = events[dayKey] || [];
+            if (dayEvents.length === 0) {
+                eventList.innerHTML = '<div style="text-align: center; color: var(--secondary);">No events</div>';
+            } else {
+                dayEvents.forEach((eventText, index) => {
+                    const eventItem = document.createElement('div');
+                    eventItem.className = 'event-list-item';
+                    eventItem.innerHTML = `<span class="event-text">${eventText}</span><button class="delete-event-btn" data-index="${index}"><i class="fas fa-trash"></i></button>`;
+                    eventList.appendChild(eventItem);
+                });
+            }
+        }
+        function addEvent() {
+            if (!selectedCalendarDay) {
+                showNotification('Please select a date first!', 'warning');
+                return;
+            }
+            const dayKey = selectedCalendarDay.dataset.date;
+            const eventText = eventDescriptionInput.value.trim();
+            if (!eventText) {
+                showNotification('Please enter an event description', 'warning');
+                return;
+            }
+            if (!events[dayKey]) {
+                events[dayKey] = [];
+            }
+            events[dayKey].push(eventText);
+            localStorage.setItem('calendarEvents', JSON.stringify(events));
+            eventDescriptionInput.value = '';
+            displayEventsForDay(dayKey);
+            renderCalendar();
+            showNotification(`Event added for ${dayKey}`, 'success');
+        }
+        function deleteEvent(dayKey, index) {
+            if (events[dayKey] && events[dayKey][index]) {
+                const eventName = events[dayKey][index];
+                events[dayKey].splice(index, 1);
+                if (events[dayKey].length === 0) {
+                    delete events[dayKey];
+                }
+                localStorage.setItem('calendarEvents', JSON.stringify(events));
+                displayEventsForDay(dayKey);
+                renderCalendar();
+                showNotification(`Event "${eventName}" deleted`, 'info');
+            }
+        }
+        function checkReminders() {
+            const now = new Date();
+            const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            if (events[todayKey] && events[todayKey].length > 0) {
+                events[todayKey].forEach(eventText => {
+                    // To keep this simple, we'll assume events are reminders for the day.
+                    // A more advanced system would parse event times.
+                    // For now, let's just show a notification for each event.
+                    showNotification(`Reminder: ${eventText}`, 'warning');
+                });
+            }
+        }
+        // Theme switching
+        function setTheme(theme) {
+            document.body.className = `theme-${theme}`;
+            localStorage.setItem('dashboardTheme', theme);
+            themeButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.theme-${theme}-btn`).classList.add('active');
+            const root = document.documentElement;
+            let primaryRgb;
+            switch(theme) {
+                case 'ocean': primaryRgb = '76, 201, 240'; break;
+                case 'forest': primaryRgb = '52, 211, 153'; break;
+                case 'sunset': primaryRgb = '249, 115, 22'; break;
+                case 'space': primaryRgb = '129, 140, 248'; break;
+                case 'aurora': primaryRgb = '125, 211, 252'; break;
+                case 'lavender': primaryRgb = '167, 139, 250'; break;
+                case 'emerald': primaryRgb = '16, 185, 129'; break;
+                case 'crimson': primaryRgb = '248, 113, 113'; break;
+                case 'twilight': primaryRgb = '192, 132, 252'; break;
+                case 'golden': primaryRgb = '245, 158, 11'; break;
+                case 'rose': primaryRgb = '251, 113, 133'; break;
+                case 'cyber': primaryRgb = '6, 182, 212'; break;
+                case 'candy': primaryRgb = '255, 107, 129'; break;
+                case 'matrix': primaryRgb = '51, 255, 51'; break;
+                case 'vintage': primaryRgb = '168, 125, 62'; break;
+            }
+            root.style.setProperty('--primary-rgb', primaryRgb);
+            showNotification(`Theme changed to ${theme}`, 'info');
+            settingsDropdown.classList.remove('show');
+        }
+        // Virtual Keyboard functions
+        function handleKeyboardInput(key) {
+            if (!activeInput) return;
+            if (key === 'space') {
+                key = ' ';
+            }
+            if (key === 'done') {
+                hideKeyboard();
+                return;
+            }
+            if (key === 'caps') {
+                isCaps = !isCaps;
+                updateKeyboardLayout();
+                return;
+            }
+            if (key === 'shift') {
+                isShift = !isShift;
+                updateKeyboardLayout();
+                return;
+            }
+            if (key === '123' || key === 'ABC') {
+                isNumbers = !isNumbers;
+                updateKeyboardLayout();
+                return;
+            }
+            if (key === '<') {
+                activeInput.value = activeInput.value.slice(0, -1);
+                return;
+            }
+            if (key === '>') {
+                // This key doesn't do anything in a simple keyboard, but you can assign a function if needed.
+                return;
+            }
+            // Handle capitalization
+            if (isCaps || isShift) {
+                activeInput.value += key.toUpperCase();
+                if (isShift) {
+                    isShift = false;
+                    updateKeyboardLayout();
+                }
+            } else {
+                activeInput.value += key;
+            }
+        }
+        function updateKeyboardLayout() {
+            const alphabetLayout = {
+                '1': 'q', '2': 'w', '3': 'e', '4': 'r', '5': 't',
+                '6': 'y', '7': 'u', '8': 'i', '9': 'o', '0': 'p',
+                '@': 'a', '#': 's', '$': 'd', '%': 'f', '&': 'g',
+                '-': 'h', '+': 'j', '(': 'k', ')': 'l',
+                '/': 'z', '*': 'x', '"': 'c', "'": 'v',
+                ':': 'b', ';': 'n', '!': 'm', '=': 'shift'
+            };
+            const numericLayout = {
+                'q': '1', 'w': '2', 'e': '3', 'r': '4', 't': '5', 
+                'y': '6', 'u': '7', 'i': '8', 'o': '9', 'p': '0', 
+                'a': '@', 's': '#', 'd': '$', 'f': '%', 'g': '&', 
+                'h': '-', 'j': '+', 'k': '(', 'l': ')', 
+                'z': '/', 'x': '*', 'c': '"', 'v': "'", 
+                'b': ':', 'n': ';', 'm': '!'
+            };
+            keyboardKeys.forEach(key => {
+                let keyText = key.textContent.toLowerCase();
+                if (isNumbers) {
+                    // Switch to numeric layout
+                    if (numericLayout[keyText]) {
+                        key.textContent = numericLayout[keyText];
+                    }
+                    // Update the toggle button
+                    if (key === toggleNumericBtn) {
+                        key.textContent = 'ABC';
+                    }
+                } else {
+                    // Switch to alphabet layout
+                    if (alphabetLayout[keyText]) {
+                        key.textContent = (isCaps || isShift) ? alphabetLayout[keyText].toUpperCase() : alphabetLayout[keyText];
+                    }
+                    // Update the toggle button
+                    if (key === toggleNumericBtn) {
+                        key.textContent = '123';
+                    }
+                }
+                // Handle special keys that don't change
+                if (key.classList.contains('wide') && !key.classList.contains('extra-wide')) {
+                    if (key.textContent.toLowerCase() === 'caps') {
+                        key.textContent = isCaps ? 'CAPS' : 'caps';
+                    } else if (key.textContent.toLowerCase() === 'shift') {
+                        key.textContent = isShift ? 'SHIFT' : 'shift';
+                    }
+                }
+            });
+        }
+        function showKeyboard(inputElement) {
+            activeInput = inputElement;
+            virtualKeyboard.classList.add('show');
+            updateKeyboardLayout(); // Ensure correct layout is shown
+        }
+        function hideKeyboard() {
+            activeInput = null;
+            virtualKeyboard.classList.remove('show');
+            // Reset keyboard state
+            isCaps = false;
+            isShift = false;
+            isNumbers = false;
+        }
+        // NEWS TICKER FUNCTIONS - MODIFIED
+        async function fetchNews() {
+            try {
+                const response = await fetch(`https://gnews.io/api/v4/top-headlines?lang=en&token=${NEWS_API_KEY}`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                if (data.articles && data.articles.length > 0) {
+                    populateNewsTicker(data.articles);
+                } else {
+                    newsTicker.textContent = "No news found.";
+                }
+            } catch (error) {
+                console.error('Error fetching news:', error);
+                // Fallback to a static message on error
+                newsTicker.innerHTML = `<span class="news-ticker-item">Failed to load news. Displaying static headlines.</span><span class="news-ticker-item">Breaking News: Smart dashboard updates now available!</span><span class="news-ticker-item">Tech Today: New AI breakthroughs announced.</span><span class="news-ticker-item">World News: Global markets remain steady.</span>`;
+            }
+        }
+        function populateNewsTicker(articles) {
+            newsTicker.innerHTML = '';
+            // Duplicate the articles to ensure a seamless loop
+            const duplicatedArticles = articles.concat(articles);
+            duplicatedArticles.forEach(article => {
+                const newsItem = document.createElement('span');
+                newsItem.className = 'news-ticker-item';
+                newsItem.textContent = article.title;
+                newsTicker.appendChild(newsItem);
+            });
+            // If API fails, this ensures a fallback is always shown
+            if (articles.length === 0) {
+                 newsTicker.innerHTML = `<span class="news-ticker-item">No news found. Displaying static headlines.</span><span class="news-ticker-item">Breaking News: Smart dashboard updates now available!</span><span class="news-ticker-item">Tech Today: New AI breakthroughs announced.</span><span class="news-ticker-item">World News: Global markets remain steady.</span>`;
+            }
+        }
+        // END NEWS TICKER FUNCTIONS
+        // Event listeners
+        function setupEventListeners() {
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    button.classList.add('active');
+                    const tabId = button.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+            // Date click to open calendar tab
+            dateEl.addEventListener('click', () => {
+                // Find and activate the calendar tab button
+                const calendarTabButton = document.querySelector('.tab-button[data-tab="calendar"]');
+                if (calendarTabButton) {
+                    calendarTabButton.click();
+                }
+            });
+            weatherCityDisplay.addEventListener('click', (e) => {
+                e.stopPropagation();
+                weatherCityDisplay.style.display = 'none';
+                weatherCityInput.style.display = 'block';
+                weatherCityInput.value = weatherCityDisplay.textContent;
+                weatherCityInput.focus();
+                showKeyboard(weatherCityInput);
+            });
+            weatherCityInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    getWeather(weatherCityInput.value.trim());
+                    weatherCityDisplay.style.display = 'block';
+                    weatherCityInput.style.display = 'none';
+                    hideKeyboard();
+                }
+            });
+            playBtn.addEventListener('click', togglePlayback);
+            prevBtn.addEventListener('click', playPreviousStation);
+            nextBtn.addEventListener('click', playNextStation);
+            volumeSlider.addEventListener('input', () => {
+                radioPlayer.volume = volumeSlider.value;
+            });
+            volumeBtn.addEventListener('click', () => {
+                radioPlayer.muted = !radioPlayer.muted;
+                volumeBtn.innerHTML = radioPlayer.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
+                showNotification(radioPlayer.muted ? 'Volume muted' : 'Volume unmuted', 'info');
+            });
+            // Language dropdown event listener
+            languageSelectBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOptionsVisible = languageSelectOptions.style.display === 'block';
+                languageSelectOptions.style.display = isOptionsVisible ? 'none' : 'block';
+                languageSelectBtn.querySelector('i').className = isOptionsVisible ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+            });
+            
+            stationSelectBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOptionsVisible = stationSelectOptions.style.display === 'block';
+                stationSelectOptions.style.display = isOptionsVisible ? 'none' : 'block';
+                stationSelectBtn.querySelector('i').className = isOptionsVisible ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+            });
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.radio-dropdown')) {
+                    stationSelectOptions.style.display = 'none';
+                    languageSelectOptions.style.display = 'none';
+                    stationSelectBtn.querySelector('i').className = 'fas fa-chevron-down';
+                    languageSelectBtn.querySelector('i').className = 'fas fa-chevron-down';
+                }
+            });
+            youtubeSearchBtn.addEventListener('click', searchYouTube);
+            youtubeSearchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    searchYouTube();
+                }
+            });
+            // New event listener for Youtube input to show keyboard
+            youtubeSearchInput.addEventListener('focus', () => {
+                showKeyboard(youtubeSearchInput);
+            });
+            youtubePlayBtn.addEventListener('click', toggleYouTubePlayback);
+            youtubePrevBtn.addEventListener('click', playPreviousVideo);
+            youtubeNextBtn.addEventListener('click', playNextVideo);
+            fullscreenBtn.addEventListener('click', toggleFullscreen);
+            timerSetBtn.addEventListener('click', setTimer);
+            timerClearBtn.addEventListener('click', clearTimer);
+            // NEW ALARM EVENT LISTENERS
+            alarmSetBtn.addEventListener('click', setAlarm);
+            alarmClearBtn.addEventListener('click', clearAlarm);
+            // END NEW ALARM EVENT LISTENERS
+            screensaverSetBtn.addEventListener('click', setScreensaverTimer);
+            screensaverClearBtn.addEventListener('click', clearScreensaverTimer);
+            screensaverDisableBtn.addEventListener('click', disableScreensaver);
+            // New event listener for timer input to show keyboard
+            timerInput.addEventListener('focus', () => {
+                showKeyboard(timerInput);
+            });
+            // NEW ALARM INPUT LISTENER
+            alarmInput.addEventListener('focus', () => {
+                showKeyboard(alarmInput);
+            });
+            // END NEW ALARM INPUT LISTENER
+            screensaverInput.addEventListener('focus', () => {
+                showKeyboard(screensaverInput);
+            });
+            themeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    setTheme(button.dataset.theme);
+                });
+            });
+            settingsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                settingsDropdown.classList.toggle('show');
+            });
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.settings-menu')) {
+                    settingsDropdown.classList.remove('show');
+                }
+            });
+            // Swipe-to-refresh for weather section
+            weatherSection.addEventListener('touchstart', (e) => {
+                touchStartY = e.touches[0].clientY;
+                isSwiping = true;
+            });
+            weatherSection.addEventListener('touchmove', (e) => {
+                if (!isSwiping) return;
+                const touchMoveY = e.touches[0].clientY;
+                const swipeDistance = touchMoveY - touchStartY;
+                if (swipeDistance > 0 && swipeDistance < 100) {
+                    loadingIndicator.style.transform = `translateX(-50%) translateY(${swipeDistance}px)`;
+                    loadingIndicator.style.opacity = '1';
+                }
+            });
+            weatherSection.addEventListener('touchend', (e) => {
+                if (!isSwiping) return;
+                const touchEndY = e.changedTouches[0].clientY;
+                const swipeDistance = touchEndY - touchStartY;
+                if (swipeDistance > 50) {
+                    getWeather(currentCity);
+                }
+                // Reset states
+                loadingIndicator.style.transform = 'translateX(-50%) translateY(-100%)';
+                loadingIndicator.style.opacity = '0';
+                isSwiping = false;
+            });
+            // Calendar navigation
+            prevMonthBtn.addEventListener('click', () => changeMonth(-1));
+            nextMonthBtn.addEventListener('click', () => changeMonth(1));
+            // New Calendar Event Functions
+            closeEventManagerBtn.addEventListener('click', closeEventManager);
+            addEventBtn.addEventListener('click', addEvent);
+            eventDescriptionInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addEvent();
+                }
+            });
+            // New event listener for event input to show keyboard
+            eventDescriptionInput.addEventListener('focus', () => {
+                showKeyboard(eventDescriptionInput);
+            });
+            eventList.addEventListener('click', (e) => {
+                if (e.target.classList.contains('delete-event-btn') || e.target.closest('.delete-event-btn')) {
+                    const button = e.target.closest('.delete-event-btn');
+                    const index = button.dataset.index;
+                    const dayKey = selectedCalendarDay.dataset.date;
+                    deleteEvent(dayKey, index);
+                }
+            });
+            // Event delegation for calendar days
+            calendarGrid.addEventListener('click', (e) => {
+                const dayElement = e.target.closest('.calendar-day');
+                if (dayElement) {
+                    selectCalendarDay(dayElement);
+                } else if (!e.target.closest('.event-manager')) {
+                    // If the click is not on a day and not inside the event manager, close the manager.
+                    closeEventManager();
+                }
+            });
+            // Global Swipe-to-refresh for the whole dashboard
+            let startY = 0;
+            const swipeThreshold = 100;
+            dashboardContainer.addEventListener('touchstart', (e) => {
+                startY = e.touches[0].clientY;
+            });
+            dashboardContainer.addEventListener('touchend', (e) => {
+                const endY = e.changedTouches[0].clientY;
+                const swipeDistance = endY - startY;
+                // Check if it's a downward swipe and exceeds the threshold
+                if (swipeDistance > swipeThreshold) {
+                    location.reload();
+                }
+            });
+            // Virtual Keyboard Event Listeners
+            keyboardToggleBtn.addEventListener('click', () => {
+                virtualKeyboard.classList.toggle('show');
+                if (virtualKeyboard.classList.contains('show')) {
+                    const activeElement = document.activeElement;
+                    if (activeElement.tagName === 'INPUT') {
+                        activeInput = activeElement;
+                    } else {
+                        // If no input is focused, focus on the search input by default
+                        youtubeSearchInput.focus();
+                        activeInput = youtubeSearchInput;
+                    }
+                } else {
+                    activeInput = null;
+                }
+            });
+            keyboardKeys.forEach(key => {
+                key.addEventListener('click', () => {
+                    handleKeyboardInput(key.textContent);
+                });
+            });
+            // Activity detection for screensaver
+            document.addEventListener('mousemove', () => {
+                resetScreensaverTimer();
+            });
+            document.addEventListener('keypress', () => {
+                resetScreensaverTimer();
+            });
+            document.addEventListener('click', () => {
+                resetScreensaverTimer();
+            });
+            document.addEventListener('touchstart', () => {
+                resetScreensaverTimer();
+            });
+            document.addEventListener('scroll', () => {
+                resetScreensaverTimer();
+            });
+            // Screensaver click to exit
+            screensaverEl.addEventListener('click', () => {
+                screensaverEl.style.display = 'none';
+                resetScreensaverTimer();
+            });
+        }
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
