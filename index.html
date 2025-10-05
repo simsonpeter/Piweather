@@ -8,6 +8,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+   <!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
     <style>
         :root {
             --primary: #4cc9f0;
@@ -2321,7 +2324,78 @@ dashboardChannel.onmessage = (event) => {
             break;
     }
 };
+// ====== FIREBASE REMOTE CONTROL ======
+const firebaseConfig = {
+  apiKey: "AIzaSyDvdsVPX3hX8V8a3V7YEd6CFCcC85zM6Ww",
+  authDomain: "smart-dashboard-remote.firebaseapp.com",
+  databaseURL: "https://smart-dashboard-remote-default-rtdb.firebaseio.com",
+  projectId: "smart-dashboard-remote",
+  storageBucket: "smart-dashboard-remote.firebasestorage.app",
+  messagingSenderId: "1030798862513",
+  appId: "1:1030798862513:web:7693cc3d343eb26757da90"
+};
 
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const remoteRef = db.ref('remote_commands');
+
+// Listen for remote commands
+remoteRef.on('value', (snapshot) => {
+  const command = snapshot.val();
+  if (command && command.timestamp) {
+    // Process only if not already handled (avoid replay)
+    const now = Date.now();
+    if (now - command.timestamp < 10000) { // ignore commands older than 10s
+      handleRemoteCommand(command);
+      // Clear the command after processing
+      remoteRef.set(null);
+    }
+  }
+});
+
+function handleRemoteCommand(cmd) {
+  console.log('Remote command:', cmd.action, cmd.payload);
+  
+  switch (cmd.action) {
+    case 'play_pause': togglePlayback(); break;
+    case 'next_station': playNextStation(); break;
+    case 'prev_station': playPreviousStation(); break;
+    case 'set_language':
+      if (cmd.payload.language) loadLanguage(cmd.payload.language);
+      break;
+    case 'set_station':
+      if (typeof cmd.payload.index === 'number') selectStation(cmd.payload.index);
+      break;
+    case 'set_alarm':
+      if (cmd.payload.time) {
+        alarmInput.value = cmd.payload.time;
+        setAlarm();
+      }
+      break;
+    case 'set_timer':
+      if (cmd.payload.time) {
+        timerInput.value = cmd.payload.time;
+        setTimer();
+      }
+      break;
+    case 'change_theme':
+      if (cmd.payload.theme) setTheme(cmd.payload.theme);
+      break;
+    case 'youtube_search':
+      if (cmd.payload.query) {
+        youtubeSearchInput.value = cmd.payload.query;
+        searchYouTube();
+        document.querySelector('.tab-button[data-tab="youtube"]').click();
+      }
+      break;
+    case 'dismiss_screensaver':
+      if (screensaverEl.style.display === 'flex') {
+        screensaverEl.style.display = 'none';
+        resetScreensaverTimer();
+      }
+      break;
+  }
+}
         function setTheme(theme) {
             document.body.className = `theme-${theme}`;
             localStorage.setItem('dashboardTheme', theme);
