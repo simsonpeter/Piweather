@@ -2262,6 +2262,65 @@
                 });
             }
         }
+        // ====== BROADCAST CHANNEL FOR REMOTE CONTROL ======
+const dashboardChannel = new BroadcastChannel('smart_dashboard');
+
+dashboardChannel.onmessage = (event) => {
+    const { action, payload } = event.data;
+
+    switch (action) {
+        case 'play_pause':
+            togglePlayback();
+            break;
+        case 'next_station':
+            playNextStation();
+            break;
+        case 'prev_station':
+            playPreviousStation();
+            break;
+        case 'set_language':
+            if (payload.language && LANGUAGE_FILES[payload.language]) {
+                loadLanguage(payload.language);
+            }
+            break;
+        case 'set_station':
+            if (typeof payload.index === 'number' && radioStations[payload.index]) {
+                selectStation(payload.index);
+            }
+            break;
+        case 'set_alarm':
+            if (payload.time) {
+                alarmInput.value = payload.time;
+                setAlarm();
+            }
+            break;
+        case 'set_timer':
+            if (payload.time) {
+                timerInput.value = payload.time;
+                setTimer();
+            }
+            break;
+        case 'change_theme':
+            if (payload.theme) {
+                setTheme(payload.theme);
+            }
+            break;
+        case 'youtube_search':
+            if (payload.query) {
+                youtubeSearchInput.value = payload.query;
+                searchYouTube();
+                // Switch to YouTube tab
+                document.querySelector('.tab-button[data-tab="youtube"]').click();
+            }
+            break;
+        case 'dismiss_screensaver':
+            if (screensaverEl.style.display === 'flex') {
+                screensaverEl.style.display = 'none';
+                resetScreensaverTimer();
+            }
+            break;
+    }
+};
 
         function setTheme(theme) {
             document.body.className = `theme-${theme}`;
