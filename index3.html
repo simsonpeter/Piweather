@@ -513,8 +513,8 @@
         }
         .radio-dropdown-options {
             position: absolute;
-            top: 100%; /* Opens downward */
-            bottom: auto;
+            top: auto;
+            bottom: 100%; /* Opens upward */
             left: 0;
             width: 100%;
             background-color: var(--card-bg);
@@ -522,7 +522,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             max-height: 120px;
             overflow-y: auto;
-            margin-top: 5px; /* Space between button and dropdown */
+            margin-bottom: 5px; /* Space between button and dropdown */
             z-index: 50;
             display: none;
             /* --- DEBUG BORDER --- */
@@ -1160,11 +1160,11 @@
                             <!-- MODIFIED: Simplified Language Dropdown -->
                             <div class="radio-dropdown">
                                 <button id="language-select-btn" class="radio-dropdown-btn">Select Language <i class="fas fa-chevron-down"></i></button>
-                                <div id="language-select-options" class="radio-dropdown-options" style="top: 100%;"></div>
+                                <div id="language-select-options" class="radio-dropdown-options"></div>
                             </div>
                             <div class="radio-dropdown">
                                 <button id="station-select-btn" class="radio-dropdown-btn">Select Station <i class="fas fa-chevron-down"></i></button>
-                                <div id="station-select-options" class="radio-dropdown-options" style="top: 100%;"></div>
+                                <div id="station-select-options" class="radio-dropdown-options"></div>
                             </div>
                         </div>
                     </section>
