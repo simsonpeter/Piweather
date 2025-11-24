@@ -329,6 +329,21 @@
             background: rgba(var(--primary-rgb), 0.2);
         }
 
+        /* Bluetooth Button */
+        .bluetooth-btn {
+            background: var(--card-bg);
+            border: none;
+            color: #1e90ff;
+            padding: 8px;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .bluetooth-btn:hover {
+            background: rgba(var(--primary-rgb), 0.2);
+        }
+
         /* Confirmation Modal */
         .modal-overlay {
             position: fixed;
@@ -370,6 +385,27 @@
             display: flex;
             gap: 10px;
             justify-content: center;
+        }
+
+        .modal-content ol {
+            text-align: left;
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+
+        .modal-content li {
+            margin: 8px 0;
+            color: var(--secondary-text);
+            line-height: 1.5;
+        }
+
+        .modal-content code {
+            background: var(--input-bg);
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: var(--primary);
+            font-family: monospace;
+            font-size: 0.9em;
         }
 
         /* Settings Dropdown */
@@ -1441,6 +1477,29 @@
             </div>
         </div>
     </div>
+    <!-- Bluetooth Instructions Modal -->
+    <div id="bluetooth-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3><i class="fab fa-bluetooth"></i> Bluetooth Audio Setup</h3>
+            <p>Connect Bluetooth speakers or headphones to your Raspberry Pi:</p>
+            <ol>
+                <li>Open terminal on your Raspberry Pi</li>
+                <li>Enter Bluetooth control: <code>bluetoothctl</code></li>
+                <li>Enable scanning: <code>scan on</code></li>
+                <li>Turn on your Bluetooth speaker/headphone (pairing mode)</li>
+                <li>Find your device MAC address in the scan results</li>
+                <li>Pair: <code>pair XX:XX:XX:XX:XX:XX</code></li>
+                <li>Connect: <code>connect XX:XX:XX:XX:XX:XX</code></li>
+                <li>Trust device: <code>trust XX:XX:XX:XX:XX:XX</code></li>
+                <li>Exit: <code>exit</code></li>
+            </ol>
+            <p style="font-size: 0.85em; margin-top: 10px;"><strong>Tip:</strong> Use <code>pavucontrol</code> to select
+                audio output device</p>
+            <div class="modal-buttons">
+                <button id="bluetooth-modal-close" class="btn primary-btn"><i class="fas fa-check"></i> Got it</button>
+            </div>
+        </div>
+    </div>
     <div id="notification" class="notification">
         <div id="notification-icon"></div>
         <span id="notification-message"></span>
@@ -1453,6 +1512,7 @@
             </div>
             <div class="header-right">
                 <button id="keyboard-toggle-btn" class="keyboard-toggle-btn"><i class="fas fa-keyboard"></i></button>
+                <button id="bluetooth-btn" class="bluetooth-btn"><i class="fab fa-bluetooth"></i></button>
                 <button id="close-btn" class="close-btn"><i class="fas fa-times"></i></button>
                 <div class="settings-menu">
                     <button id="settings-btn" class="settings-btn"><i class="fas fa-cog"></i></button>
@@ -3181,6 +3241,25 @@
             closeModal.addEventListener('click', (e) => {
                 if (e.target === closeModal) {
                     closeModal.classList.remove('show');
+                }
+            });
+            // Bluetooth button functionality
+            const bluetoothBtn = document.getElementById('bluetooth-btn');
+            const bluetoothModal = document.getElementById('bluetooth-modal');
+            const bluetoothModalClose = document.getElementById('bluetooth-modal-close');
+
+            bluetoothBtn.addEventListener('click', () => {
+                bluetoothModal.classList.add('show');
+            });
+
+            bluetoothModalClose.addEventListener('click', () => {
+                bluetoothModal.classList.remove('show');
+            });
+
+            // Close bluetooth modal when clicking outside
+            bluetoothModal.addEventListener('click', (e) => {
+                if (e.target === bluetoothModal) {
+                    bluetoothModal.classList.remove('show');
                 }
             });
             weatherSection.addEventListener('touchstart', (e) => {
