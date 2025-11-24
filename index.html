@@ -238,9 +238,108 @@
             --btn-bg: #8d7b69;
             --btn-hover-bg: #a19280;
             --danger: #c2524a;
-            --success: #7da84a;
-            --warning: #e09f3e;
             --scroll-thumb: #a19280;
+        }
+
+        /* TV Widget */
+        .tv-widget {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex-grow: 1;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .tv-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .tv-channel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 8px;
+            overflow-y: auto;
+            flex-grow: 1;
+            padding: 5px;
+        }
+
+        .tv-channel-grid::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .tv-channel-grid::-webkit-scrollbar-thumb {
+            background-color: var(--scroll-thumb);
+            border-radius: 3px;
+        }
+
+        .tv-channel-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .tv-channel-card:hover {
+            border-color: var(--primary);
+            transform: scale(1.02);
+            box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.3);
+        }
+
+        .tv-channel-logo {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 50%;
+            background-color: var(--input-bg);
+        }
+
+        .tv-channel-name {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--primary-text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 100%;
+        }
+
+        .tv-live-badge {
+            font-size: 0.6rem;
+            background-color: var(--danger);
+            color: var(--primary-text);
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .tv-player-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .tv-player {
+            width: 100%;
+            flex-grow: 1;
+            background-color: #000;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .tv-player iframe,
+        .tv-player video {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
 
         /* Base styles */
@@ -1579,6 +1678,7 @@
             <div class="tab-buttons">
                 <button class="tab-button active" data-tab="home"><i class="fas fa-home"></i> Home</button>
                 <button class="tab-button" data-tab="youtube"><i class="fab fa-youtube"></i> YouTube</button>
+                <button class="tab-button" data-tab="tv"><i class="fas fa-tv"></i> TV</button>
                 <button class="tab-button" data-tab="calendar"><i class="fas fa-calendar-alt"></i> Calendar</button>
             </div>
             <div id="home-tab" class="tab-content active">
@@ -1722,6 +1822,19 @@
                     </div>
                 </section>
             </div>
+            <div id="tv-tab" class="tab-content">
+                <section class="widget tv-widget">
+                    <div class="tv-controls">
+                        <input type="text" id="tv-search" class="input-field" placeholder="Search channels...">
+                    </div>
+                    <div id="tv-channel-grid" class="tv-channel-grid"></div>
+                    <div id="tv-player-container" class="tv-player-container" style="display: none;">
+                        <button id="tv-player-close" class="btn primary-btn" style="margin-bottom: 10px;"><i
+                                class="fas fa-arrow-left"></i> Back to Channels</button>
+                        <div id="tv-player" class="tv-player"></div>
+                    </div>
+                </section>
+            </div>
         </main>
         <div class="news-ticker-container">
             <div class="news-ticker" id="news-ticker">
@@ -1773,7 +1886,6 @@
             <button class="keyboard-key">v</button>
             <button class="keyboard-key">b</button>
             <button class="keyboard-key">n</button>
-            <button class="keyboard-key">m</button>
             <button class="keyboard-key">
                 << /button>
                     <button class="keyboard-key">></button>
@@ -3262,6 +3374,113 @@
                     bluetoothModal.classList.remove('show');
                 }
             });
+            // ==================== TV TAB FUNCTIONALITY ====================
+            let tvChannels = [];
+            let tvCurrentChannel = null;
+            const tvSearchInput = document.getElementById('tv-search');
+            const tvChannelGrid = document.getElementById('tv-channel-grid');
+            const tvPlayerContainer = document.getElementById('tv-player-container');
+            const tvPlayer = document.getElementById('tv-player');
+            const tvPlayerClose = document.getElementById('tv-player-close');
+
+            // Fetch TV channels from API
+            async function fetchTVChannels() {
+                try {
+                    const response = await fetch('https://raw.githubusercontent.com/simsonpeter/Tctvs/refs/heads/main/tv.json');
+                    if (!response.ok) throw new Error('Failed to fetch channels');
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching TV channels:', error);
+                    showNotification('Failed to load TV channels', 'error');
+                    return [];
+                }
+            }
+
+            // Render TV channels grid
+            function renderTVChannels(channels = tvChannels, searchTerm = '') {
+                tvChannelGrid.innerHTML = '';
+
+                let filteredChannels = channels;
+                if (searchTerm) {
+                    filteredChannels = channels.filter(ch =>
+                        ch.name.toLowerCase().includes(searchTerm.toLowerCase())
+                    );
+                }
+
+                if (filteredChannels.length === 0) {
+                    tvChannelGrid.innerHTML = '<p style="text-align: center; color: var(--secondary-text); padding: 20px;">No channels found</p>';
+                    return;
+                }
+
+                filteredChannels.forEach(channel => {
+                    const card = document.createElement('div');
+                    card.className = 'tv-channel-card';
+                    card.innerHTML = `
+                        <img src="${channel.logo || ''}" class="tv-channel-logo" alt="${channel.name}" onerror="this.style.background='var(--input-bg)'">
+                        <div class="tv-channel-name">${channel.name}</div>
+                        <div class="tv-live-badge">LIVE</div>
+                    `;
+                    card.addEventListener('click', () => playTVChannel(channel));
+                    tvChannelGrid.appendChild(card);
+                });
+            }
+
+            // Play TV channel
+            function playTVChannel(channel) {
+                tvCurrentChannel = channel;
+                tvChannelGrid.style.display = 'none';
+                tvPlayerContainer.style.display = 'flex';
+                tvSearchInput.style.display = 'none';
+
+                // Clear previous player content
+                tvPlayer.innerHTML = '';
+
+                // Check if it's a YouTube URL
+                const youtubeMatch = channel.url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/);
+
+                if (youtubeMatch) {
+                    const videoId = youtubeMatch[1];
+                    tvPlayer.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                } else if (channel.url.includes('.m3u8')) {
+                    // HLS stream - use video tag
+                    tvPlayer.innerHTML = `<video controls autoplay><source src="${channel.url}" type="application/x-mpegURL">Your browser does not support HLS playback.</video>`;
+                } else {
+                    // Try generic video tag
+                    tvPlayer.innerHTML = `<video controls autoplay><source src="${channel.url}">Your browser does not support this video format.</video>`;
+                }
+
+                showNotification(`Playing: ${channel.name}`, 'info');
+            }
+
+            // Close TV player
+            tvPlayerClose.addEventListener('click', () => {
+                tvChannelGrid.style.display = 'grid';
+                tvPlayerContainer.style.display = 'none';
+                tvSearchInput.style.display = 'block';
+                tvPlayer.innerHTML = '';
+                tvCurrentChannel = null;
+            });
+
+            // Search TV channels
+            tvSearchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.trim();
+                renderTVChannels(tvChannels, searchTerm);
+            });
+
+            // Initialize TV tab when clicked
+            const tvTabButton = document.querySelector('[data-tab="tv"]');
+            let tvInitialized = false;
+
+            tvTabButton.addEventListener('click', async () => {
+                if (!tvInitialized) {
+                    showNotification('Loading TV channels...', 'info');
+                    tvChannels = await fetchTVChannels();
+                    renderTVChannels(tvChannels);
+                    tvInitialized = true;
+                }
+            });
+
+            // Swipe-to-refresh for weather section
             weatherSection.addEventListener('touchstart', (e) => {
                 touchStartY = e.touches[0].clientY;
                 isSwiping = true;
