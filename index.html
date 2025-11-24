@@ -316,19 +316,17 @@
 
         /* Close Button */
         .close-btn {
-            background: var(--danger);
+            background: var(--card-bg);
             border: none;
-            color: var(--primary-text);
-            padding: 8px 12px;
+            color: var(--danger);
+            padding: 8px;
             font-size: 1rem;
             border-radius: 6px;
             cursor: pointer;
-            transition: all 0.2s;
         }
 
         .close-btn:hover {
-            background: #c41e3a;
-            transform: scale(1.05);
+            background: rgba(var(--primary-rgb), 0.2);
         }
 
         /* Confirmation Modal */
@@ -1455,7 +1453,7 @@
             </div>
             <div class="header-right">
                 <button id="keyboard-toggle-btn" class="keyboard-toggle-btn"><i class="fas fa-keyboard"></i></button>
-                <button id="close-btn" class="close-btn"><i class="fas fa-times"></i> Close</button>
+                <button id="close-btn" class="close-btn"><i class="fas fa-times"></i></button>
                 <div class="settings-menu">
                     <button id="settings-btn" class="settings-btn"><i class="fas fa-cog"></i></button>
                     <div id="settings-dropdown" class="settings-dropdown">
