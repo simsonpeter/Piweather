@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,9 +9,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-   <!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
     <style>
         :root {
             --primary: #4cc9f0;
@@ -28,49 +29,220 @@
             --warning: #ffb703;
             --scroll-thumb: #00b4d8;
         }
+
         /* --- THEMES --- */
         .theme-forest {
-            --primary: #34d399; --primary-rgb: 52, 211, 153; --secondary: #6ee7b7; --background: #064e3b; --card-bg: #042f2e; --input-bg: #0f766e; --btn-bg: #0d9488; --btn-hover-bg: #2dd4bf; --danger: #ef4444; --success: #10b981; --warning: #fbbf24; --scroll-thumb: #14b8a6;
+            --primary: #34d399;
+            --primary-rgb: 52, 211, 153;
+            --secondary: #6ee7b7;
+            --background: #064e3b;
+            --card-bg: #042f2e;
+            --input-bg: #0f766e;
+            --btn-bg: #0d9488;
+            --btn-hover-bg: #2dd4bf;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #fbbf24;
+            --scroll-thumb: #14b8a6;
         }
+
         .theme-sunset {
-            --primary: #f97316; --primary-rgb: 249, 115, 22; --secondary: #fcd34d; --background: #5a1810; --card-bg: #2d1413; --input-bg: #993b16; --btn-bg: #f97316; --btn-hover-bg: #fb923c; --danger: #ef4444; --success: #34d399; --warning: #fcd34d; --scroll-thumb: #ea580c;
+            --primary: #f97316;
+            --primary-rgb: 249, 115, 22;
+            --secondary: #fcd34d;
+            --background: #5a1810;
+            --card-bg: #2d1413;
+            --input-bg: #993b16;
+            --btn-bg: #f97316;
+            --btn-hover-bg: #fb923c;
+            --danger: #ef4444;
+            --success: #34d399;
+            --warning: #fcd34d;
+            --scroll-thumb: #ea580c;
         }
+
         .theme-space {
-            --primary: #818cf8; --primary-rgb: 129, 140, 248; --secondary: #c7d2fe; --background: #111827; --card-bg: #1f2937; --input-bg: #374151; --btn-bg: #4f46e5; --btn-hover-bg: #6366f1; --danger: #f87171; --success: #4ade80; --warning: #facc15; --scroll-thumb: #6b7280;
+            --primary: #818cf8;
+            --primary-rgb: 129, 140, 248;
+            --secondary: #c7d2fe;
+            --background: #111827;
+            --card-bg: #1f2937;
+            --input-bg: #374151;
+            --btn-bg: #4f46e5;
+            --btn-hover-bg: #6366f1;
+            --danger: #f87171;
+            --success: #4ade80;
+            --warning: #facc15;
+            --scroll-thumb: #6b7280;
         }
+
         .theme-aurora {
-            --primary: #7dd3fc; --primary-rgb: 125, 211, 252; --secondary: #bae6fd; --background: #083344; --card-bg: #0c4a6e; --input-bg: #0e7490; --btn-bg: #0284c7; --btn-hover-bg: #38bdf8; --danger: #ef4444; --success: #22c55e; --warning: #facc15; --scroll-thumb: #0ea5e9;
+            --primary: #7dd3fc;
+            --primary-rgb: 125, 211, 252;
+            --secondary: #bae6fd;
+            --background: #083344;
+            --card-bg: #0c4a6e;
+            --input-bg: #0e7490;
+            --btn-bg: #0284c7;
+            --btn-hover-bg: #38bdf8;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --warning: #facc15;
+            --scroll-thumb: #0ea5e9;
         }
+
         .theme-lavender {
-            --primary: #a78bfa; --primary-rgb: 167, 139, 250; --secondary: #d8b4fe; --background: #2e1050; --card-bg: #3b0764; --input-bg: #581c87; --btn-bg: #7e22ce; --btn-hover-bg: #9333ea; --danger: #f43f5e; --success: #4ade80; --warning: #facc15; --scroll-thumb: #9333ea;
+            --primary: #a78bfa;
+            --primary-rgb: 167, 139, 250;
+            --secondary: #d8b4fe;
+            --background: #2e1050;
+            --card-bg: #3b0764;
+            --input-bg: #581c87;
+            --btn-bg: #7e22ce;
+            --btn-hover-bg: #9333ea;
+            --danger: #f43f5e;
+            --success: #4ade80;
+            --warning: #facc15;
+            --scroll-thumb: #9333ea;
         }
+
         .theme-emerald {
-            --primary: #10b981; --primary-rgb: 16, 185, 129; --secondary: #6ee7b7; --background: #022c22; --card-bg: #047857; --input-bg: #059669; --btn-bg: #065f46; --btn-hover-bg: #047857; --danger: #ef4444; --success: #4ade80; --warning: #fbbf24; --scroll-thumb: #059669;
+            --primary: #10b981;
+            --primary-rgb: 16, 185, 129;
+            --secondary: #6ee7b7;
+            --background: #022c22;
+            --card-bg: #047857;
+            --input-bg: #059669;
+            --btn-bg: #065f46;
+            --btn-hover-bg: #047857;
+            --danger: #ef4444;
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --scroll-thumb: #059669;
         }
+
         .theme-crimson {
-            --primary: #f87171; --primary-rgb: 248, 113, 113; --secondary: #fca5a5; --background: #450a0a; --card-bg: #7f1d1d; --input-bg: #b91c1c; --btn-bg: #ef4444; --btn-hover-bg: #f87171; --danger: #fca5a5; --success: #4ade80; --warning: #facc15; --scroll-thumb: #b91c1c;
+            --primary: #f87171;
+            --primary-rgb: 248, 113, 113;
+            --secondary: #fca5a5;
+            --background: #450a0a;
+            --card-bg: #7f1d1d;
+            --input-bg: #b91c1c;
+            --btn-bg: #ef4444;
+            --btn-hover-bg: #f87171;
+            --danger: #fca5a5;
+            --success: #4ade80;
+            --warning: #facc15;
+            --scroll-thumb: #b91c1c;
         }
+
         .theme-twilight {
-            --primary: #c084fc; --primary-rgb: 192, 132, 252; --secondary: #e9d5ff; --background: #240a34; --card-bg: #4f256b; --input-bg: #6b21a8; --btn-bg: #8b5cf6; --btn-hover-bg: #a855f7; --danger: #ef4444; --success: #4ade80; --warning: #facc15; --scroll-thumb: #7e22ce;
+            --primary: #c084fc;
+            --primary-rgb: 192, 132, 252;
+            --secondary: #e9d5ff;
+            --background: #240a34;
+            --card-bg: #4f256b;
+            --input-bg: #6b21a8;
+            --btn-bg: #8b5cf6;
+            --btn-hover-bg: #a855f7;
+            --danger: #ef4444;
+            --success: #4ade80;
+            --warning: #facc15;
+            --scroll-thumb: #7e22ce;
         }
+
         .theme-golden {
-            --primary: #f59e0b; --primary-rgb: 245, 158, 11; --secondary: #fcd34d; --background: #362e1c; --card-bg: #78350f; --input-bg: #92400e; --btn-bg: #d97706; --btn-hover-bg: #fcd34d; --danger: #ef4444; --success: #4ade80; --warning: #facc15; --scroll-thumb: #ca8a04;
+            --primary: #f59e0b;
+            --primary-rgb: 245, 158, 11;
+            --secondary: #fcd34d;
+            --background: #362e1c;
+            --card-bg: #78350f;
+            --input-bg: #92400e;
+            --btn-bg: #d97706;
+            --btn-hover-bg: #fcd34d;
+            --danger: #ef4444;
+            --success: #4ade80;
+            --warning: #facc15;
+            --scroll-thumb: #ca8a04;
         }
+
         .theme-rose {
-            --primary: #fb7185; --primary-rgb: 251, 113, 133; --secondary: #fecdd3; --background: #500724; --card-bg: #881337; --input-bg: #9f1239; --btn-bg: #e11d48; --btn-hover-bg: #f43f5e; --danger: #f87171; --success: #4ade80; --warning: #facc15; --scroll-thumb: #be185d;
+            --primary: #fb7185;
+            --primary-rgb: 251, 113, 133;
+            --secondary: #fecdd3;
+            --background: #500724;
+            --card-bg: #881337;
+            --input-bg: #9f1239;
+            --btn-bg: #e11d48;
+            --btn-hover-bg: #f43f5e;
+            --danger: #f87171;
+            --success: #4ade80;
+            --warning: #facc15;
+            --scroll-thumb: #be185d;
         }
+
         .theme-cyber {
-            --primary: #06b6d4; --primary-rgb: 6, 182, 212; --secondary: #67e8f9; --background: #020617; --card-bg: #1e293b; --input-bg: #334155; --btn-bg: #06b6d4; --btn-hover-bg: #22d3ee; --danger: #ef4444; --success: #10b981; --warning: #facc15; --scroll-thumb: #0891b2;
+            --primary: #06b6d4;
+            --primary-rgb: 6, 182, 212;
+            --secondary: #67e8f9;
+            --background: #020617;
+            --card-bg: #1e293b;
+            --input-bg: #334155;
+            --btn-bg: #06b6d4;
+            --btn-hover-bg: #22d3ee;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #facc15;
+            --scroll-thumb: #0891b2;
         }
+
         .theme-candy {
-            --primary: #FF6B81; --primary-rgb: 255, 107, 129; --secondary: #FFC0CB; --background: #8e44ad; --card-bg: #c084fc; --input-bg: #d8b4fe; --btn-bg: #f472b6; --btn-hover-bg: #f87171; --danger: #fca5a5; --success: #a7f3d0; --warning: #facc15; --scroll-thumb: #e879f9;
+            --primary: #FF6B81;
+            --primary-rgb: 255, 107, 129;
+            --secondary: #FFC0CB;
+            --background: #8e44ad;
+            --card-bg: #c084fc;
+            --input-bg: #d8b4fe;
+            --btn-bg: #f472b6;
+            --btn-hover-bg: #f87171;
+            --danger: #fca5a5;
+            --success: #a7f3d0;
+            --warning: #facc15;
+            --scroll-thumb: #e879f9;
         }
+
         .theme-matrix {
-            --primary: #33ff33; --primary-rgb: 51, 255, 51; --secondary: #aaffaa; --primary-text: #ffffff; --secondary-text: #aaaaaa; --background: #000000; --card-bg: #080808; --input-bg: #111111; --btn-bg: #004400; --btn-hover-bg: #008800; --danger: #ff6666; --success: #33ff33; --warning: #ffff66; --scroll-thumb: #00ff00;
+            --primary: #33ff33;
+            --primary-rgb: 51, 255, 51;
+            --secondary: #aaffaa;
+            --primary-text: #ffffff;
+            --secondary-text: #aaaaaa;
+            --background: #000000;
+            --card-bg: #080808;
+            --input-bg: #111111;
+            --btn-bg: #004400;
+            --btn-hover-bg: #008800;
+            --danger: #ff6666;
+            --success: #33ff33;
+            --warning: #ffff66;
+            --scroll-thumb: #00ff00;
         }
+
         .theme-vintage {
-            --primary: #a87d3e; --primary-rgb: 168, 125, 62; --secondary: #d4b88c; --background: #3c3228; --card-bg: #574b40; --input-bg: #7b6f63; --btn-bg: #8d7b69; --btn-hover-bg: #a19280; --danger: #c2524a; --success: #7da84a; --warning: #e09f3e; --scroll-thumb: #a19280;
+            --primary: #a87d3e;
+            --primary-rgb: 168, 125, 62;
+            --secondary: #d4b88c;
+            --background: #3c3228;
+            --card-bg: #574b40;
+            --input-bg: #7b6f63;
+            --btn-bg: #8d7b69;
+            --btn-hover-bg: #a19280;
+            --danger: #c2524a;
+            --success: #7da84a;
+            --warning: #e09f3e;
+            --scroll-thumb: #a19280;
         }
+
         /* Base styles */
         * {
             margin: 0;
@@ -79,6 +251,7 @@
             font-family: 'Poppins', sans-serif;
             transition: all 0.2s ease-in-out;
         }
+
         body {
             background-color: var(--background);
             color: var(--primary-text);
@@ -88,6 +261,7 @@
             overflow: hidden;
             overscroll-behavior-y: none;
         }
+
         .dashboard-container {
             width: 800px;
             height: 480px;
@@ -97,6 +271,7 @@
             gap: 10px;
             overflow: hidden;
         }
+
         .dashboard-header {
             display: flex;
             justify-content: space-between;
@@ -104,9 +279,11 @@
             flex-wrap: nowrap;
             gap: 10px;
         }
+
         .time-container {
             flex-grow: 1;
         }
+
         #clock {
             font-size: 2.5rem;
             font-weight: 600;
@@ -114,16 +291,19 @@
             color: var(--primary-text);
             cursor: pointer;
         }
+
         #date {
             font-size: 0.9rem;
             color: var(--secondary-text);
             cursor: pointer;
         }
+
         .header-right {
             display: flex;
             align-items: center;
             gap: 10px;
         }
+
         .keyboard-toggle-btn {
             background: var(--card-bg);
             border: none;
@@ -133,9 +313,72 @@
             border-radius: 6px;
             cursor: pointer;
         }
+
+        /* Close Button */
+        .close-btn {
+            background: var(--danger);
+            border: none;
+            color: var(--primary-text);
+            padding: 8px 12px;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: #c41e3a;
+            transform: scale(1.05);
+        }
+
+        /* Confirmation Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-content h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .modal-content p {
+            color: var(--secondary-text);
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        /* Settings Dropdown */
         .settings-menu {
             position: relative;
         }
+
         .settings-btn {
             background: var(--card-bg);
             border: none;
@@ -145,6 +388,7 @@
             border-radius: 6px;
             cursor: pointer;
         }
+
         .settings-dropdown {
             position: absolute;
             top: 100%;
@@ -160,22 +404,29 @@
             transform: translateY(10px);
             transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
         }
+
         .settings-dropdown.show {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
         }
-        .theme-selector h4, .radio-timer h4, .screensaver-settings h4, .radio-alarm h4 {
+
+        .theme-selector h4,
+        .radio-timer h4,
+        .screensaver-settings h4,
+        .radio-alarm h4 {
             margin-bottom: 5px;
             color: var(--primary);
             font-size: 0.9rem;
         }
+
         .theme-buttons {
             display: flex;
             flex-wrap: wrap;
             gap: 5px;
             margin-bottom: 10px;
         }
+
         .theme-btn {
             width: 22px;
             height: 22px;
@@ -185,40 +436,97 @@
             outline: none;
             transition: transform 0.2s, border-color 0.2s;
         }
+
         .theme-btn:hover {
             transform: scale(1.1);
         }
+
         .theme-btn.active {
             border-color: var(--primary);
             transform: scale(1.1);
         }
-        .theme-ocean-btn { background-color: #03045e; }
-        .theme-forest-btn { background-color: #064e3b; }
-        .theme-sunset-btn { background-color: #5a1810; }
-        .theme-space-btn { background-color: #1f2937; }
-        .theme-aurora-btn { background-color: #0c4a6e; }
-        .theme-lavender-btn { background-color: #3b0764; }
-        .theme-emerald-btn { background-color: #047857; }
-        .theme-crimson-btn { background-color: #7f1d1d; }
-        .theme-twilight-btn { background-color: #4f256b; }
-        .theme-golden-btn { background-color: #78350f; }
-        .theme-rose-btn { background-color: #881337; }
-        .theme-cyber-btn { background-color: #1e293b; }
-        .theme-candy-btn { background-color: #c084fc; }
-        .theme-matrix-btn { background-color: #080808; }
-        .theme-vintage-btn { background-color: #574b40; }
-        .radio-timer .input-field, .screensaver-settings .input-field, .radio-alarm .input-field {
+
+        .theme-ocean-btn {
+            background-color: #03045e;
+        }
+
+        .theme-forest-btn {
+            background-color: #064e3b;
+        }
+
+        .theme-sunset-btn {
+            background-color: #5a1810;
+        }
+
+        .theme-space-btn {
+            background-color: #1f2937;
+        }
+
+        .theme-aurora-btn {
+            background-color: #0c4a6e;
+        }
+
+        .theme-lavender-btn {
+            background-color: #3b0764;
+        }
+
+        .theme-emerald-btn {
+            background-color: #047857;
+        }
+
+        .theme-crimson-btn {
+            background-color: #7f1d1d;
+        }
+
+        .theme-twilight-btn {
+            background-color: #4f256b;
+        }
+
+        .theme-golden-btn {
+            background-color: #78350f;
+        }
+
+        .theme-rose-btn {
+            background-color: #881337;
+        }
+
+        .theme-cyber-btn {
+            background-color: #1e293b;
+        }
+
+        .theme-candy-btn {
+            background-color: #c084fc;
+        }
+
+        .theme-matrix-btn {
+            background-color: #080808;
+        }
+
+        .theme-vintage-btn {
+            background-color: #574b40;
+        }
+
+        .radio-timer .input-field,
+        .screensaver-settings .input-field,
+        .radio-alarm .input-field {
             margin-bottom: 5px;
         }
-        .radio-timer .button-group, .screensaver-settings .button-group, .radio-alarm .button-group {
+
+        .radio-timer .button-group,
+        .screensaver-settings .button-group,
+        .radio-alarm .button-group {
             display: flex;
             gap: 5px;
             margin-bottom: 5px;
         }
-        #timer-display, #screensaver-display, #alarm-display {
+
+        #timer-display,
+        #screensaver-display,
+        #alarm-display {
             font-size: 0.8em;
             color: var(--secondary-text);
         }
+
         .dashboard-main {
             display: flex;
             flex-direction: column;
@@ -226,6 +534,7 @@
             flex-grow: 1;
             overflow: hidden;
         }
+
         .tab-buttons {
             display: flex;
             gap: 5px;
@@ -233,13 +542,16 @@
             -webkit-overflow-scrolling: touch;
             padding-bottom: 5px;
         }
+
         .tab-buttons::-webkit-scrollbar {
             height: 5px;
         }
+
         .tab-buttons::-webkit-scrollbar-thumb {
             background: var(--scroll-thumb);
             border-radius: 5px;
         }
+
         .tab-button {
             padding: 6px 12px;
             font-size: 0.9rem;
@@ -252,21 +564,25 @@
             flex-shrink: 0;
             min-width: 80px;
         }
+
         .tab-button.active {
             color: var(--primary-text);
             border-color: var(--primary);
             background-color: rgba(var(--primary-rgb), 0.2);
         }
+
         .tab-content {
             display: none;
             flex-grow: 1;
             overflow: hidden;
             height: 100%;
         }
+
         .tab-content.active {
             display: flex;
             flex-direction: column;
         }
+
         .widget {
             background-color: var(--card-bg);
             border-radius: 10px;
@@ -279,16 +595,20 @@
             transform: scale(1);
             transition: all 0.2s ease-in-out;
         }
-        .widget:hover, .widget:active {
+
+        .widget:hover,
+        .widget:active {
             border-color: var(--primary);
             box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.3);
             transform: scale(1.01);
         }
+
         .widget h2 {
             margin-bottom: 5px;
             color: var(--primary-text);
             font-size: 1.1rem;
         }
+
         .widget-header {
             display: flex;
             justify-content: space-between;
@@ -297,16 +617,19 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding-bottom: 5px;
         }
+
         .widget-header h2 {
             margin: 0;
             font-size: 1.1rem;
             color: var(--primary);
         }
+
         .weather-widget {
             display: flex;
             flex-direction: column;
             align-items: center;
         }
+
         .loading-indicator {
             position: absolute;
             top: 0;
@@ -317,10 +640,12 @@
             opacity: 0;
             transition: all 0.3s ease-in-out;
         }
+
         .loading-indicator.show {
             opacity: 1;
             transform: translateX(-50%) translateY(10px);
         }
+
         .weather-content {
             display: flex;
             flex-direction: column;
@@ -328,6 +653,7 @@
             width: 100%;
             flex-grow: 1;
         }
+
         .weather-main-info {
             display: flex;
             justify-content: center;
@@ -337,16 +663,19 @@
             flex-wrap: nowrap;
             gap: 10px;
         }
+
         .weather-location-container {
             flex-grow: 1;
             text-align: center;
         }
+
         #weather-city-display {
             font-size: 1.2rem;
             color: var(--primary-text);
             cursor: pointer;
             transition: color 0.2s;
         }
+
         #weather-city-input {
             width: 100%;
             font-size: 1.2rem;
@@ -356,27 +685,32 @@
             color: var(--primary-text);
             border-bottom: 2px solid var(--primary);
         }
+
         #temperature {
             font-size: 2.5rem;
             font-weight: 600;
             color: var(--primary-text);
             margin-left: 10px;
         }
+
         .weather-icon-container {
             width: 50px;
             height: 50px;
         }
+
         .weather-icon-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
+
         .weather-details {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 8px;
             width: 100%;
         }
+
         .weather-item {
             background-color: var(--input-bg);
             border-radius: 6px;
@@ -386,21 +720,25 @@
             align-items: center;
             gap: 3px;
         }
+
         .weather-item i {
             font-size: 1rem;
             color: var(--primary);
         }
+
         .weather-item p {
             font-size: 0.9rem;
             font-weight: 600;
             color: var(--primary-text);
             line-height: 1;
         }
+
         .weather-item span {
             font-size: 0.6rem;
             color: var(--secondary-text);
             line-height: 1;
         }
+
         .radio-widget {
             display: flex;
             flex-direction: column;
@@ -409,6 +747,7 @@
             height: 100%;
             justify-content: center;
         }
+
         .radio-controls {
             display: flex;
             flex-direction: column;
@@ -418,6 +757,7 @@
             flex-grow: 1;
             justify-content: center;
         }
+
         .station-info {
             display: flex;
             flex-direction: column;
@@ -425,21 +765,25 @@
             gap: 5px;
             text-align: center;
         }
+
         /* 🔥 HIDE STATION ICON COMPLETELY */
         .station-info img {
             display: none !important;
         }
+
         #current-station-name {
             font-size: 0.9rem;
             font-weight: 600;
             color: var(--primary-text);
         }
+
         .radio-buttons {
             display: flex;
             gap: 10px;
             align-items: center;
             justify-content: center;
         }
+
         #radio-play-btn {
             font-size: 1.5rem;
             width: 50px;
@@ -454,10 +798,12 @@
             cursor: pointer;
             transition: transform 0.2s, background-color 0.2s;
         }
+
         #radio-play-btn:hover {
             transform: scale(1.1);
             background-color: var(--btn-hover-bg);
         }
+
         .volume-container {
             display: flex;
             align-items: center;
@@ -465,6 +811,7 @@
             width: 80%;
             margin-top: 10px;
         }
+
         .volume-slider {
             width: 100%;
             height: 5px;
@@ -474,6 +821,7 @@
             outline: none;
             cursor: pointer;
         }
+
         .volume-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 14px;
@@ -481,11 +829,13 @@
             background: var(--primary);
             border-radius: 50%;
         }
+
         .radio-dropdown {
             position: relative;
             width: 100%;
             margin-top: 6px;
         }
+
         .radio-dropdown-btn {
             width: 100%;
             background-color: var(--input-bg);
@@ -499,38 +849,47 @@
             align-items: center;
             font-size: 0.8rem;
         }
+
         /* ✅ DROP-UP: Changed from top:100% to bottom:100% */
         .radio-dropdown-options {
             position: absolute;
-            bottom: 100%; /* 👈 DROP-UP */
+            bottom: 100%;
+            /* 👈 DROP-UP */
             left: 0;
             width: 100%;
             background-color: var(--card-bg);
             border-radius: 6px;
-            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1); /* shadow upward */
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+            /* shadow upward */
             max-height: 120px;
             overflow-y: auto;
-            margin-bottom: 5px; /* 👈 was margin-top */
+            margin-bottom: 5px;
+            /* 👈 was margin-top */
             z-index: 9999;
             display: none;
         }
+
         .radio-dropdown-options::-webkit-scrollbar {
             width: 5px;
         }
+
         .radio-dropdown-options::-webkit-scrollbar-thumb {
             background-color: var(--scroll-thumb);
             border-radius: 3px;
         }
+
         .radio-dropdown-option {
             padding: 8px 10px;
             cursor: pointer;
             color: var(--secondary-text);
             font-size: 0.8rem;
         }
+
         .radio-dropdown-option:hover {
             background-color: var(--btn-hover-bg);
             color: var(--primary-text);
         }
+
         .home-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -538,9 +897,11 @@
             height: 100%;
             overflow: hidden;
         }
+
         .weather-widget {
             height: 100%;
         }
+
         .radio-widget {
             height: 100%;
             display: flex;
@@ -549,6 +910,7 @@
             align-items: center;
             text-align: center;
         }
+
         .youtube-widget {
             display: flex;
             flex-direction: column;
@@ -557,10 +919,12 @@
             height: 100%;
             overflow: hidden;
         }
+
         .Youtube {
             display: flex;
             gap: 5px;
         }
+
         .youtube-player-container {
             flex-grow: 1;
             display: flex;
@@ -568,12 +932,14 @@
             gap: 5px;
             position: relative;
         }
+
         #youtube-player {
             width: 100%;
             height: 100%;
             border-radius: 8px;
             overflow: hidden;
         }
+
         /* Fullscreen styles */
         .fullscreen {
             position: fixed !important;
@@ -585,6 +951,7 @@
             background: #000;
             border-radius: 0 !important;
         }
+
         #exit-fullscreen-btn {
             display: none;
             position: absolute;
@@ -592,14 +959,17 @@
             right: 10px;
             z-index: 10000;
         }
+
         .fullscreen #exit-fullscreen-btn {
             display: block;
         }
+
         .youtube-controls {
             display: flex;
             justify-content: center;
             gap: 5px;
         }
+
         .youtube-results {
             flex-grow: 1;
             overflow-y: auto;
@@ -607,13 +977,16 @@
             background-color: var(--input-bg);
             padding: 5px;
         }
+
         .youtube-results::-webkit-scrollbar {
             width: 5px;
         }
+
         .youtube-results::-webkit-scrollbar-thumb {
             background-color: var(--scroll-thumb);
             border-radius: 3px;
         }
+
         .youtube-result-item {
             padding: 5px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -621,12 +994,15 @@
             transition: background-color 0.2s;
             font-size: 0.8rem;
         }
+
         .youtube-result-item:last-child {
             border-bottom: none;
         }
+
         .youtube-result-item:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
+
         .calendar-widget {
             display: flex;
             flex-direction: column;
@@ -634,20 +1010,24 @@
             flex-grow: 1;
             height: 100%;
         }
+
         .calendar-container {
             width: 100%;
             max-width: 600px;
         }
+
         .calendar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
         }
+
         .calendar-header h2 {
             margin: 0;
             font-size: 1.1rem;
         }
+
         .calendar-weekdays {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -657,11 +1037,13 @@
             margin-bottom: 5px;
             font-size: 0.8rem;
         }
+
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 3px;
         }
+
         .calendar-day {
             text-align: center;
             padding: 5px;
@@ -671,29 +1053,36 @@
             color: var(--primary-text);
             font-size: 0.8rem;
         }
+
         .calendar-day .day-number {
             display: block;
         }
+
         .calendar-day:not(.other-month):hover {
             background-color: rgba(var(--primary-rgb), 0.2);
         }
+
         .calendar-day.other-month {
             color: var(--secondary-text);
             opacity: 0.6;
             pointer-events: none;
         }
+
         .calendar-day.current-day {
             background-color: var(--input-bg);
             border: 2px solid var(--primary);
         }
+
         .calendar-day.selected {
             background-color: var(--primary);
             color: var(--card-bg);
             font-weight: bold;
         }
+
         .calendar-day.special-day {
             position: relative;
         }
+
         .calendar-day.special-day:after {
             content: '\f061';
             font-family: 'Font Awesome 6 Free';
@@ -704,6 +1093,7 @@
             font-size: 0.6em;
             color: var(--warning);
         }
+
         .btn {
             padding: 6px 10px;
             border: none;
@@ -713,18 +1103,23 @@
             color: var(--primary-text);
             transition: background-color 0.2s;
         }
+
         .primary-btn {
             background-color: var(--btn-bg);
         }
+
         .primary-btn:hover {
             background-color: var(--btn-hover-bg);
         }
+
         .secondary-btn {
             background-color: var(--input-bg);
         }
+
         .secondary-btn:hover {
             background-color: var(--btn-hover-bg);
         }
+
         .input-field {
             width: 100%;
             padding: 6px 10px;
@@ -735,9 +1130,11 @@
             font-size: 0.8rem;
             outline: none;
         }
+
         .input-field::placeholder {
             color: var(--secondary-text);
         }
+
         .notification {
             position: fixed;
             top: 10px;
@@ -759,14 +1156,17 @@
             transition: all 0.3s ease-in-out;
             font-size: 0.9rem;
         }
+
         .notification.show {
             visibility: visible;
             opacity: 1;
             transform: translateY(0) translateX(-50%);
         }
+
         .notification i {
             font-size: 1.1rem;
         }
+
         .event-manager {
             position: fixed;
             bottom: 0;
@@ -783,33 +1183,40 @@
             transform: translateX(100%);
             transition: transform 0.3s ease-in-out;
         }
+
         .event-manager.show {
             transform: translateX(0);
         }
+
         .event-manager-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
         }
+
         .event-manager h3 {
             margin: 0;
             font-size: 0.9em;
             color: var(--primary-text);
         }
+
         .event-input-group {
             display: flex;
             gap: 5px;
             margin-bottom: 8px;
         }
+
         .event-input-group .input-field {
             flex-grow: 1;
         }
+
         .event-list {
             flex-grow: 1;
             overflow-y: auto;
             padding-right: 5px;
         }
+
         .event-list-item {
             display: flex;
             align-items: center;
@@ -822,10 +1229,12 @@
             color: var(--secondary-text);
             font-size: 0.8rem;
         }
+
         .event-text {
             flex-grow: 1;
             margin-right: 5px;
         }
+
         .delete-event-btn {
             background: none;
             border: none;
@@ -835,26 +1244,32 @@
             opacity: 0.7;
             transition: opacity 0.2s;
         }
+
         .delete-event-btn:hover {
             opacity: 1;
         }
+
         .event-list::-webkit-scrollbar {
             width: 5px;
         }
+
         .event-list::-webkit-scrollbar-thumb {
             background-color: var(--scroll-thumb);
             border-radius: 3px;
         }
+
         .calendar-day.has-events .day-event-count {
             display: block;
             font-size: 0.5em;
             color: var(--primary);
             text-align: center;
         }
+
         .calendar-day.has-events .day-number {
             font-weight: bold;
             color: var(--primary);
         }
+
         #virtual-keyboard {
             position: fixed;
             bottom: 0;
@@ -868,14 +1283,17 @@
             display: none;
             z-index: 2000;
         }
+
         #virtual-keyboard.show {
             display: block;
         }
+
         .keyboard-row {
             display: flex;
             justify-content: center;
             margin-bottom: 5px;
         }
+
         .keyboard-key {
             background-color: var(--input-bg);
             color: var(--primary-text);
@@ -891,16 +1309,21 @@
             text-align: center;
             transition: background-color 0.1s, transform 0.1s;
         }
-        .keyboard-key:hover, .keyboard-key:active {
+
+        .keyboard-key:hover,
+        .keyboard-key:active {
             background-color: var(--btn-hover-bg);
             transform: scale(1.05);
         }
+
         .keyboard-key.wide {
             flex-grow: 1.5;
         }
+
         .keyboard-key.extra-wide {
             flex-grow: 3;
         }
+
         .screensaver {
             position: fixed;
             top: 0;
@@ -916,48 +1339,58 @@
             flex-direction: column;
             gap: 20px;
         }
+
         #screensaver-clock {
             font-size: 8rem;
             font-weight: 300;
             letter-spacing: 5px;
             font-family: 'Poppins', sans-serif;
         }
+
         .screensaver-weather {
             display: flex;
             align-items: center;
             gap: 20px;
         }
+
         .screensaver-weather-icon {
             width: 100px;
             height: 100px;
         }
+
         .screensaver-weather-icon img {
             width: 100%;
             height: 100%;
             object-fit: contain;
         }
+
         #screensaver-temperature {
             font-size: 4rem;
             font-weight: 600;
         }
+
         #screensaver-city {
             font-size: 2rem;
             font-weight: 300;
         }
+
         .screensaver-now-playing {
             display: flex;
             align-items: center;
             gap: 15px;
             margin-top: 10px;
         }
+
         /* 🔥 HIDE SCREENSAVER STATION ICON */
         .screensaver-now-playing img {
             display: none !important;
         }
+
         .screensaver-now-playing-text {
             font-size: 1.2rem;
             font-weight: 500;
         }
+
         .news-ticker-container {
             width: 100%;
             height: 30px;
@@ -966,33 +1399,50 @@
             overflow: hidden;
             position: relative;
         }
+
         .news-ticker {
             display: inline-block;
             white-space: nowrap;
             animation: ticker-scroll 120s linear infinite;
         }
+
         .news-ticker-item {
             display: inline-block;
             padding: 0 1rem;
             font-size: 0.9rem;
             color: var(--primary-text);
         }
+
         .news-ticker-item:before {
             content: "\2022";
             color: var(--primary);
             margin-right: 0.5rem;
         }
+
         @keyframes ticker-scroll {
             0% {
                 transform: translateX(0%);
             }
+
             100% {
                 transform: translateX(-50%);
             }
         }
     </style>
 </head>
+
 <body class="theme-ocean">
+    <!-- Confirmation Modal -->
+    <div id="close-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3><i class="fas fa-exclamation-triangle"></i> Close Application?</h3>
+            <p>Are you sure you want to close the dashboard and exit kiosk mode?</p>
+            <div class="modal-buttons">
+                <button id="confirm-close-btn" class="btn primary-btn"><i class="fas fa-check"></i> Yes, Close</button>
+                <button id="cancel-close-btn" class="btn secondary-btn"><i class="fas fa-times"></i> Cancel</button>
+            </div>
+        </div>
+    </div>
     <div id="notification" class="notification">
         <div id="notification-icon"></div>
         <span id="notification-message"></span>
@@ -1005,27 +1455,34 @@
             </div>
             <div class="header-right">
                 <button id="keyboard-toggle-btn" class="keyboard-toggle-btn"><i class="fas fa-keyboard"></i></button>
+                <button id="close-btn" class="close-btn"><i class="fas fa-times"></i> Close</button>
                 <div class="settings-menu">
                     <button id="settings-btn" class="settings-btn"><i class="fas fa-cog"></i></button>
                     <div id="settings-dropdown" class="settings-dropdown">
                         <div class="theme-selector">
                             <h4>Themes</h4>
                             <div class="theme-buttons">
-                                <button class="theme-btn theme-ocean-btn active" data-theme="ocean" title="Ocean"></button>
+                                <button class="theme-btn theme-ocean-btn active" data-theme="ocean"
+                                    title="Ocean"></button>
                                 <button class="theme-btn theme-forest-btn" data-theme="forest" title="Forest"></button>
                                 <button class="theme-btn theme-sunset-btn" data-theme="sunset" title="Sunset"></button>
                                 <button class="theme-btn theme-space-btn" data-theme="space" title="Space"></button>
                                 <button class="theme-btn theme-aurora-btn" data-theme="aurora" title="Aurora"></button>
-                                <button class="theme-btn theme-lavender-btn" data-theme="lavender" title="Lavender"></button>
-                                <button class="theme-btn theme-emerald-btn" data-theme="emerald" title="Emerald"></button>
-                                <button class="theme-btn theme-crimson-btn" data-theme="crimson" title="Crimson"></button>
-                                <button class="theme-btn theme-twilight-btn" data-theme="twilight" title="Twilight"></button>
+                                <button class="theme-btn theme-lavender-btn" data-theme="lavender"
+                                    title="Lavender"></button>
+                                <button class="theme-btn theme-emerald-btn" data-theme="emerald"
+                                    title="Emerald"></button>
+                                <button class="theme-btn theme-crimson-btn" data-theme="crimson"
+                                    title="Crimson"></button>
+                                <button class="theme-btn theme-twilight-btn" data-theme="twilight"
+                                    title="Twilight"></button>
                                 <button class="theme-btn theme-golden-btn" data-theme="golden" title="Golden"></button>
                                 <button class="theme-btn theme-rose-btn" data-theme="rose" title="Rose"></button>
                                 <button class="theme-btn theme-cyber-btn" data-theme="cyber" title="Cyber"></button>
                                 <button class="theme-btn theme-candy-btn" data-theme="candy" title="Candy"></button>
                                 <button class="theme-btn theme-matrix-btn" data-theme="matrix" title="Matrix"></button>
-                                <button class="theme-btn theme-vintage-btn" data-theme="vintage" title="Vintage"></button>
+                                <button class="theme-btn theme-vintage-btn" data-theme="vintage"
+                                    title="Vintage"></button>
                             </div>
                         </div>
                         <div class="radio-timer">
@@ -1076,7 +1533,8 @@
                                 <input type="text" id="weather-city-input" class="input-field" style="display: none;">
                             </div>
                         </div>
-                        <div id="loading-indicator" class="loading-indicator"><i class="fas fa-sync-alt fa-spin"></i></div>
+                        <div id="loading-indicator" class="loading-indicator"><i class="fas fa-sync-alt fa-spin"></i>
+                        </div>
                         <div class="weather-content">
                             <div class="weather-main-info">
                                 <div class="weather-icon-container">
@@ -1141,20 +1599,27 @@
                             </div>
                             <audio id="radio-player" preload="metadata"></audio>
                             <div class="radio-buttons">
-                                <button id="radio-prev-btn" class="btn secondary-btn"><i class="fas fa-backward"></i></button>
+                                <button id="radio-prev-btn" class="btn secondary-btn"><i
+                                        class="fas fa-backward"></i></button>
                                 <button id="radio-play-btn" class="btn"><i class="fas fa-play"></i></button>
-                                <button id="radio-next-btn" class="btn secondary-btn"><i class="fas fa-forward"></i></button>
+                                <button id="radio-next-btn" class="btn secondary-btn"><i
+                                        class="fas fa-forward"></i></button>
                             </div>
                             <div class="volume-container">
-                                <button id="volume-btn" class="btn volume-btn" style="background-color: var(--primary-text); color: var(--card-bg);"><i class="fas fa-volume-up"></i></button>
-                                <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5" class="volume-slider">
+                                <button id="volume-btn" class="btn volume-btn"
+                                    style="background-color: var(--primary-text); color: var(--card-bg);"><i
+                                        class="fas fa-volume-up"></i></button>
+                                <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5"
+                                    class="volume-slider">
                             </div>
                             <div class="radio-dropdown">
-                                <button id="language-select-btn" class="radio-dropdown-btn">Select Language <i class="fas fa-chevron-down"></i></button>
+                                <button id="language-select-btn" class="radio-dropdown-btn">Select Language <i
+                                        class="fas fa-chevron-down"></i></button>
                                 <div id="language-select-options" class="radio-dropdown-options"></div>
                             </div>
                             <div class="radio-dropdown">
-                                <button id="station-select-btn" class="radio-dropdown-btn">Select Station <i class="fas fa-chevron-down"></i></button>
+                                <button id="station-select-btn" class="radio-dropdown-btn">Select Station <i
+                                        class="fas fa-chevron-down"></i></button>
                                 <div id="station-select-options" class="radio-dropdown-options"></div>
                             </div>
                         </div>
@@ -1170,11 +1635,15 @@
                     <div id="youtube-results" class="youtube-results"></div>
                     <div id="youtube-player-container" class="youtube-player-container">
                         <div id="youtube-player"></div>
-                        <button id="exit-fullscreen-btn" class="btn secondary-btn"><i class="fas fa-compress"></i> Exit Fullscreen</button>
+                        <button id="exit-fullscreen-btn" class="btn secondary-btn"><i class="fas fa-compress"></i> Exit
+                            Fullscreen</button>
                         <div class="youtube-controls">
-                            <button id="youtube-prev-btn" class="btn secondary-btn"><i class="fas fa-step-backward"></i></button>
-                            <button id="youtube-play-btn" class="btn primary-btn"><i class="fas fa-play"></i> Play</button>
-                            <button id="youtube-next-btn" class="btn secondary-btn"><i class="fas fa-step-forward"></i></button>
+                            <button id="youtube-prev-btn" class="btn secondary-btn"><i
+                                    class="fas fa-step-backward"></i></button>
+                            <button id="youtube-play-btn" class="btn primary-btn"><i class="fas fa-play"></i>
+                                Play</button>
+                            <button id="youtube-next-btn" class="btn secondary-btn"><i
+                                    class="fas fa-step-forward"></i></button>
                             <button id="fullscreen-btn" class="btn secondary-btn"><i class="fas fa-expand"></i></button>
                         </div>
                     </div>
@@ -1201,7 +1670,7 @@
                 <span class="news-ticker-item">Loading news...</span>
             </div>
         </div>
-        </div>
+    </div>
     <div id="event-manager" class="event-manager">
         <div class="event-manager-header">
             <h3>Events</h3>
@@ -1247,8 +1716,9 @@
             <button class="keyboard-key">b</button>
             <button class="keyboard-key">n</button>
             <button class="keyboard-key">m</button>
-            <button class="keyboard-key"><</button>
-            <button class="keyboard-key">></button>
+            <button class="keyboard-key">
+                << /button>
+                    <button class="keyboard-key">></button>
         </div>
         <div class="keyboard-row">
             <button class="keyboard-key wide" id="toggle-numeric-btn">123</button>
@@ -1398,7 +1868,7 @@
                     const value = languageData.ui[key];
                     if (typeof value === 'string' && value.trim().length > 0) return value;
                 }
-            } catch (_) {}
+            } catch (_) { }
             return fallback !== undefined ? fallback : key;
         }
 
@@ -1466,7 +1936,7 @@
         function getStationDisplayName(station) {
             if (!station) return '';
             const selectedLang = selectedLanguage;
-            const code = LANGUAGE_CODE_MAP[selectedLang] || selectedLang?.slice(0,2).toLowerCase();
+            const code = LANGUAGE_CODE_MAP[selectedLang] || selectedLang?.slice(0, 2).toLowerCase();
             const candidates = [];
             if (station.nameTranslations && typeof station.nameTranslations === 'object') {
                 if (station.nameTranslations[selectedLang]) candidates.push(station.nameTranslations[selectedLang]);
@@ -1563,7 +2033,7 @@
 
         function showNotification(message, type = 'info') {
             notificationMessage.textContent = message;
-            switch(type) {
+            switch (type) {
                 case 'success':
                     notificationIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
                     notification.style.borderLeftColor = 'var(--success)';
@@ -1715,18 +2185,18 @@
             if (!station) return;
             radioPlayer.src = station.url;
             radioPlayer.play()
-            .then(() => {
-                isPlaying = true;
-                playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                showNotification(`Playing: ${getStationDisplayName(station)}`, 'success');
-                if (screensaverEl.style.display === 'flex') {
-                    updateScreensaverContent();
-                }
-            })
-            .catch(error => {
-                console.error('Playback failed:', error);
-                showNotification('Failed to play radio station', 'error');
-            });
+                .then(() => {
+                    isPlaying = true;
+                    playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    showNotification(`Playing: ${getStationDisplayName(station)}`, 'success');
+                    if (screensaverEl.style.display === 'flex') {
+                        updateScreensaverContent();
+                    }
+                })
+                .catch(error => {
+                    console.error('Playback failed:', error);
+                    showNotification('Failed to play radio station', 'error');
+                });
         }
 
         function stopRadio() {
@@ -1983,7 +2453,7 @@
             tag.src = "https://www.youtube.com/iframe_api";
             const firstScriptTag = document.getElementsByTagName('script')[0];
             firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-            window.onYouTubeIframeAPIReady = function() {
+            window.onYouTubeIframeAPIReady = function () {
                 youtubePlayer = new YT.Player('youtube-player', {
                     height: '100%',
                     width: '100%',
@@ -2266,136 +2736,136 @@
             }
         }
         // ====== BROADCAST CHANNEL FOR REMOTE CONTROL ======
-const dashboardChannel = new BroadcastChannel('smart_dashboard');
+        const dashboardChannel = new BroadcastChannel('smart_dashboard');
 
-dashboardChannel.onmessage = (event) => {
-    const { action, payload } = event.data;
+        dashboardChannel.onmessage = (event) => {
+            const { action, payload } = event.data;
 
-    switch (action) {
-        case 'play_pause':
-            togglePlayback();
-            break;
-        case 'next_station':
-            playNextStation();
-            break;
-        case 'prev_station':
-            playPreviousStation();
-            break;
-        case 'set_language':
-            if (payload.language && LANGUAGE_FILES[payload.language]) {
-                loadLanguage(payload.language);
+            switch (action) {
+                case 'play_pause':
+                    togglePlayback();
+                    break;
+                case 'next_station':
+                    playNextStation();
+                    break;
+                case 'prev_station':
+                    playPreviousStation();
+                    break;
+                case 'set_language':
+                    if (payload.language && LANGUAGE_FILES[payload.language]) {
+                        loadLanguage(payload.language);
+                    }
+                    break;
+                case 'set_station':
+                    if (typeof payload.index === 'number' && radioStations[payload.index]) {
+                        selectStation(payload.index);
+                    }
+                    break;
+                case 'set_alarm':
+                    if (payload.time) {
+                        alarmInput.value = payload.time;
+                        setAlarm();
+                    }
+                    break;
+                case 'set_timer':
+                    if (payload.time) {
+                        timerInput.value = payload.time;
+                        setTimer();
+                    }
+                    break;
+                case 'change_theme':
+                    if (payload.theme) {
+                        setTheme(payload.theme);
+                    }
+                    break;
+                case 'youtube_search':
+                    if (payload.query) {
+                        youtubeSearchInput.value = payload.query;
+                        searchYouTube();
+                        // Switch to YouTube tab
+                        document.querySelector('.tab-button[data-tab="youtube"]').click();
+                    }
+                    break;
+                case 'dismiss_screensaver':
+                    if (screensaverEl.style.display === 'flex') {
+                        screensaverEl.style.display = 'none';
+                        resetScreensaverTimer();
+                    }
+                    break;
             }
-            break;
-        case 'set_station':
-            if (typeof payload.index === 'number' && radioStations[payload.index]) {
-                selectStation(payload.index);
-            }
-            break;
-        case 'set_alarm':
-            if (payload.time) {
-                alarmInput.value = payload.time;
-                setAlarm();
-            }
-            break;
-        case 'set_timer':
-            if (payload.time) {
-                timerInput.value = payload.time;
-                setTimer();
-            }
-            break;
-        case 'change_theme':
-            if (payload.theme) {
-                setTheme(payload.theme);
-            }
-            break;
-        case 'youtube_search':
-            if (payload.query) {
-                youtubeSearchInput.value = payload.query;
-                searchYouTube();
-                // Switch to YouTube tab
-                document.querySelector('.tab-button[data-tab="youtube"]').click();
-            }
-            break;
-        case 'dismiss_screensaver':
-            if (screensaverEl.style.display === 'flex') {
-                screensaverEl.style.display = 'none';
-                resetScreensaverTimer();
-            }
-            break;
-    }
-};
-// ====== FIREBASE REMOTE CONTROL ======
-const firebaseConfig = {
-  apiKey: "AIzaSyDvdsVPX3hX8V8a3V7YEd6CFCcC85zM6Ww",
-  authDomain: "smart-dashboard-remote.firebaseapp.com",
-  databaseURL: "https://smart-dashboard-remote-default-rtdb.firebaseio.com",
-  projectId: "smart-dashboard-remote",
-  storageBucket: "smart-dashboard-remote.firebasestorage.app",
-  messagingSenderId: "1030798862513",
-  appId: "1:1030798862513:web:7693cc3d343eb26757da90"
-};
+        };
+        // ====== FIREBASE REMOTE CONTROL ======
+        const firebaseConfig = {
+            apiKey: "AIzaSyDvdsVPX3hX8V8a3V7YEd6CFCcC85zM6Ww",
+            authDomain: "smart-dashboard-remote.firebaseapp.com",
+            databaseURL: "https://smart-dashboard-remote-default-rtdb.firebaseio.com",
+            projectId: "smart-dashboard-remote",
+            storageBucket: "smart-dashboard-remote.firebasestorage.app",
+            messagingSenderId: "1030798862513",
+            appId: "1:1030798862513:web:7693cc3d343eb26757da90"
+        };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const remoteRef = db.ref('remote_commands');
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const remoteRef = db.ref('remote_commands');
 
-// Listen for remote commands
-remoteRef.on('value', (snapshot) => {
-  const command = snapshot.val();
-  if (command && command.timestamp) {
-    // Process only if not already handled (avoid replay)
-    const now = Date.now();
-    if (now - command.timestamp < 10000) { // ignore commands older than 10s
-      handleRemoteCommand(command);
-      // Clear the command after processing
-      remoteRef.set(null);
-    }
-  }
-});
+        // Listen for remote commands
+        remoteRef.on('value', (snapshot) => {
+            const command = snapshot.val();
+            if (command && command.timestamp) {
+                // Process only if not already handled (avoid replay)
+                const now = Date.now();
+                if (now - command.timestamp < 10000) { // ignore commands older than 10s
+                    handleRemoteCommand(command);
+                    // Clear the command after processing
+                    remoteRef.set(null);
+                }
+            }
+        });
 
-function handleRemoteCommand(cmd) {
-  console.log('Remote command:', cmd.action, cmd.payload);
-  
-  switch (cmd.action) {
-    case 'play_pause': togglePlayback(); break;
-    case 'next_station': playNextStation(); break;
-    case 'prev_station': playPreviousStation(); break;
-    case 'set_language':
-      if (cmd.payload.language) loadLanguage(cmd.payload.language);
-      break;
-    case 'set_station':
-      if (typeof cmd.payload.index === 'number') selectStation(cmd.payload.index);
-      break;
-    case 'set_alarm':
-      if (cmd.payload.time) {
-        alarmInput.value = cmd.payload.time;
-        setAlarm();
-      }
-      break;
-    case 'set_timer':
-      if (cmd.payload.time) {
-        timerInput.value = cmd.payload.time;
-        setTimer();
-      }
-      break;
-    case 'change_theme':
-      if (cmd.payload.theme) setTheme(cmd.payload.theme);
-      break;
-    case 'youtube_search':
-      if (cmd.payload.query) {
-        youtubeSearchInput.value = cmd.payload.query;
-        searchYouTube();
-        document.querySelector('.tab-button[data-tab="youtube"]').click();
-      }
-      break;
-    case 'dismiss_screensaver':
-      if (screensaverEl.style.display === 'flex') {
-        screensaverEl.style.display = 'none';
-        resetScreensaverTimer();
-      }
-      break;
-  }
-}
+        function handleRemoteCommand(cmd) {
+            console.log('Remote command:', cmd.action, cmd.payload);
+
+            switch (cmd.action) {
+                case 'play_pause': togglePlayback(); break;
+                case 'next_station': playNextStation(); break;
+                case 'prev_station': playPreviousStation(); break;
+                case 'set_language':
+                    if (cmd.payload.language) loadLanguage(cmd.payload.language);
+                    break;
+                case 'set_station':
+                    if (typeof cmd.payload.index === 'number') selectStation(cmd.payload.index);
+                    break;
+                case 'set_alarm':
+                    if (cmd.payload.time) {
+                        alarmInput.value = cmd.payload.time;
+                        setAlarm();
+                    }
+                    break;
+                case 'set_timer':
+                    if (cmd.payload.time) {
+                        timerInput.value = cmd.payload.time;
+                        setTimer();
+                    }
+                    break;
+                case 'change_theme':
+                    if (cmd.payload.theme) setTheme(cmd.payload.theme);
+                    break;
+                case 'youtube_search':
+                    if (cmd.payload.query) {
+                        youtubeSearchInput.value = cmd.payload.query;
+                        searchYouTube();
+                        document.querySelector('.tab-button[data-tab="youtube"]').click();
+                    }
+                    break;
+                case 'dismiss_screensaver':
+                    if (screensaverEl.style.display === 'flex') {
+                        screensaverEl.style.display = 'none';
+                        resetScreensaverTimer();
+                    }
+                    break;
+            }
+        }
         function setTheme(theme) {
             document.body.className = `theme-${theme}`;
             localStorage.setItem('dashboardTheme', theme);
@@ -2403,7 +2873,7 @@ function handleRemoteCommand(cmd) {
             document.querySelector(`.theme-${theme}-btn`).classList.add('active');
             const root = document.documentElement;
             let primaryRgb;
-            switch(theme) {
+            switch (theme) {
                 case 'ocean': primaryRgb = '76, 201, 240'; break;
                 case 'forest': primaryRgb = '52, 211, 153'; break;
                 case 'sunset': primaryRgb = '249, 115, 22'; break;
@@ -2477,11 +2947,11 @@ function handleRemoteCommand(cmd) {
                 ':': 'b', ';': 'n', '!': 'm', '=': 'shift'
             };
             const numericLayout = {
-                'q': '1', 'w': '2', 'e': '3', 'r': '4', 't': '5', 
-                'y': '6', 'u': '7', 'i': '8', 'o': '9', 'p': '0', 
-                'a': '@', 's': '#', 'd': '$', 'f': '%', 'g': '&', 
-                'h': '-', 'j': '+', 'k': '(', 'l': ')', 
-                'z': '/', 'x': '*', 'c': '"', 'v': "'", 
+                'q': '1', 'w': '2', 'e': '3', 'r': '4', 't': '5',
+                'y': '6', 'u': '7', 'i': '8', 'o': '9', 'p': '0',
+                'a': '@', 's': '#', 'd': '$', 'f': '%', 'g': '&',
+                'h': '-', 'j': '+', 'k': '(', 'l': ')',
+                'z': '/', 'x': '*', 'c': '"', 'v': "'",
                 'b': ':', 'n': ';', 'm': '!'
             };
             keyboardKeys.forEach(key => {
@@ -2677,6 +3147,44 @@ function handleRemoteCommand(cmd) {
                     settingsDropdown.classList.remove('show');
                 }
             });
+            // Close button functionality
+            const closeBtn = document.getElementById('close-btn');
+            const closeModal = document.getElementById('close-modal');
+            const confirmCloseBtn = document.getElementById('confirm-close-btn');
+            const cancelCloseBtn = document.getElementById('cancel-close-btn');
+
+            closeBtn.addEventListener('click', () => {
+                closeModal.classList.add('show');
+            });
+
+            cancelCloseBtn.addEventListener('click', () => {
+                closeModal.classList.remove('show');
+            });
+
+            confirmCloseBtn.addEventListener('click', () => {
+                // Try multiple methods to close the window
+                // Method 1: Standard window.close()
+                window.close();
+
+                // Method 2: For kiosk mode, try to trigger browser close
+                setTimeout(() => {
+                    // If window.close() didn't work, try opening a blank page
+                    window.location.href = 'about:blank';
+                }, 100);
+
+                // Show a message if close doesn't work
+                setTimeout(() => {
+                    closeModal.classList.remove('show');
+                    showNotification('Press Alt+F4 to exit kiosk mode', 'info');
+                }, 500);
+            });
+
+            // Close modal when clicking outside
+            closeModal.addEventListener('click', (e) => {
+                if (e.target === closeModal) {
+                    closeModal.classList.remove('show');
+                }
+            });
             weatherSection.addEventListener('touchstart', (e) => {
                 touchStartY = e.touches[0].clientY;
                 isSwiping = true;
@@ -2774,4 +3282,5 @@ function handleRemoteCommand(cmd) {
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
+
 </html>
