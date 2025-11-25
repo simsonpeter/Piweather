@@ -3435,18 +3435,30 @@
                 // Clear previous player content
                 tvPlayer.innerHTML = '';
 
-                // Check if it's a YouTube URL
-                const youtubeMatch = channel.url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/);
+                // Normalise the URL (support old 'url' field as fallback)
+                const url = channel.streamUrl || channel.url || '';
+
+                // YouTube detection – only if we have a string
+                const youtubeMatch = typeof url === 'string'
+                    ? url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/)
+                    : null;
 
                 if (youtubeMatch) {
                     const videoId = youtubeMatch[1];
                     tvPlayer.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-                } else if (channel.url.includes('.m3u8')) {
-                    // HLS stream - use video tag
-                    tvPlayer.innerHTML = `<video controls autoplay><source src="${channel.url}" type="application/x-mpegURL">Your browser does not support HLS playback.</video>`;
+                } else if (url.includes('.m3u8')) {
+                    // HLS stream
+                    tvPlayer.innerHTML = `<video controls autoplay><source src="${url}" type="application/x-mpegURL">Your browser does not support HLS playback.</video>`;
+                } else if (url) {
+                    // Generic video URL
+                    tvPlayer.innerHTML = `<video controls autoplay><source src="${url}">Your browser does not support this video format.</video>`;
                 } else {
-                    // Try generic video tag
-                    tvPlayer.innerHTML = `<video controls autoplay><source src="${channel.url}">Your browser does not support this video format.</video>`;
+                    showNotification('No playable URL found for this channel', 'error');
+                    // Restore UI so the user can pick another channel
+                    tvChannelGrid.style.display = 'grid';
+                    tvPlayerContainer.style.display = 'none';
+                    tvSearchInput.style.display = 'block';
+                    return;
                 }
 
                 showNotification(`Playing: ${channel.name}`, 'info');
