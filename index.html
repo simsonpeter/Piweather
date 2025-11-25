@@ -2170,7 +2170,7 @@
             const savedTheme = localStorage.getItem('dashboardTheme') || 'ocean';
             setTheme(savedTheme);
             weatherCityDisplay.textContent = currentCity;
-            setInterval(() => getWeather(currentCity), 900000);
+            setInterval(() => getWeather(currentCity), 300000); // Refresh weather every 5 minutes
             setInterval(checkReminders, 60000);
             resetScreensaverTimer();
             loadScreensaverSettings();
